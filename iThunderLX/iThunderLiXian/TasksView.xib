@@ -62,7 +62,7 @@
 							<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 							<string>NeXT TIFF v4.0 pasteboard type</string>
 						</set>
-						<string key="NSFrame">{{111, 438}, {22, 19}}</string>
+						<string key="NSFrame">{{78, 447}, {22, 19}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="801951197"/>
@@ -83,7 +83,7 @@
 					<object class="NSButton" id="276614238">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">-2147483380</int>
-						<string key="NSFrame">{{20, 440}, {53, 17}}</string>
+						<string key="NSFrame">{{11, 449}, {53, 17}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="29490677"/>
@@ -112,7 +112,7 @@
 					<object class="NSTextField" id="801951197">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{176, 440}, {714, 17}}</string>
+						<string key="NSFrame">{{111, 449}, {714, 17}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<reference key="NSWindow"/>
 						<string key="NSReuseIdentifierKey">_NS:1535</string>
@@ -155,7 +155,7 @@
 									<object class="NSCollectionView" id="340681439">
 										<reference key="NSNextResponder" ref="616714804"/>
 										<int key="NSvFlags">274</int>
-										<string key="NSFrameSize">{813, 471}</string>
+										<string key="NSFrameSize">{813, 508}</string>
 										<reference key="NSSuperview" ref="616714804"/>
 										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="188198480"/>
@@ -174,7 +174,7 @@
 										<int key="NSDraggingSourceMaskForNonLocal">0</int>
 									</object>
 								</array>
-								<string key="NSFrame">{{1, 1}, {813, 471}}</string>
+								<string key="NSFrame">{{1, 1}, {813, 508}}</string>
 								<reference key="NSSuperview" ref="85197859"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="340681439"/>
@@ -212,7 +212,7 @@
 								<double key="NSPercent">0.63157892227172852</double>
 							</object>
 						</array>
-						<string key="NSFrame">{{0, -40}, {815, 473}}</string>
+						<string key="NSFrame">{{0, -40}, {815, 510}}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="616714804"/>
@@ -534,7 +534,7 @@
 						<bool key="NSTransparent">NO</bool>
 					</object>
 				</array>
-				<string key="NSFrameSize">{815, 91}</string>
+				<string key="NSFrameSize">{815, 103}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="548530321"/>
@@ -1063,8 +1063,8 @@
 						<reference key="object" ref="1005"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="85197859"/>
-							<reference ref="801951197"/>
 							<reference ref="29490677"/>
+							<reference ref="801951197"/>
 							<reference ref="276614238"/>
 						</array>
 						<reference key="parent" ref="0"/>
@@ -1369,6 +1369,35 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">TasksView</string>
 					<string key="superclassName">NSViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="button_check_for_delete:">id</string>
+						<string key="button_start_download:">id</string>
+						<string key="menu_cancel_delete_fiLe:">id</string>
+						<string key="menu_cloud_play:">id</string>
+						<string key="menu_share:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="button_check_for_delete:">
+							<string key="name">button_check_for_delete:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="button_start_download:">
+							<string key="name">button_start_download:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="menu_cancel_delete_fiLe:">
+							<string key="name">menu_cancel_delete_fiLe:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="menu_cloud_play:">
+							<string key="name">menu_cloud_play:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="menu_share:">
+							<string key="name">menu_share:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="array_controller">NSArrayController</string>
 						<string key="check_for_delete">NSButton</string>

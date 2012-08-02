@@ -258,11 +258,11 @@
         return;
     }
     
-    if (message_view.view.isHidden) {
+    if (message_view.view.isHidden) {        
         [message_view showMessage:@"正在删除云端任务。。。"];
         [tasks_view thread_delete_yunfile];
-        current_page = 0;
         [tasks_view clear_task_list];
+        current_page = 0;
         dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
             [tasks_view thread_get_task_list:current_page];
             [message_view hideMessage];
