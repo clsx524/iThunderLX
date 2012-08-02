@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>iThunderLX 更新日志</title>
+      <link>http://clsx524.github.com</link>
+      <description>iThunderLX 更新日志 - clsx524</description>
+      <language>zh-Hans</language>
+         <item>
+            <title>Version 1.0</title>
+						<sparkle:releaseNotesLink>
+							http://。。。
+						</sparkle:releaseNotesLink>
+            <pubDate>2012-07-30</pubDate>
+            <enclosure url="http://.。。" sparkle:shortVersionString="1.2" sparkle:version="1" length="2852902" type="application/octet-stream" sparkle:dsaSignature="MC0CFBjj/Ir7130woy/l68jNFe3ZLOaHAhUAmd9VKP9R31E0Jyk90EaF+Eo1Ax4=" />
+         </item>
+   </channel>
+</rss>
