@@ -18,7 +18,7 @@ iThunderLX
 
 4. 使用MPlayerX播放迅雷云点播  
 
-**TIP**:需要在MPlayerX设置中**取消**使用ffmpeg处理流！否则无法播放视频
+   **TIP**:需要在MPlayerX设置中**取消**使用ffmpeg处理流！否则无法播放视频
 	
 5. 支持删除云端任务的功能
 
