@@ -40,6 +40,7 @@
         
         message_view = [[MessageView alloc]initWithNibName:@"MessageView" bundle:[NSBundle bundleForClass:[self class]] TasksView:self];
         [collection setValue:@(0) forKey:@"_animationDuration"];
+        [nav_button setHidden:YES];
     }
     return self;
 }
@@ -95,6 +96,7 @@
 //--------------------------------------------------------------
 - (void)thread_get_task_list:(NSInteger)page_num
 {
+    [nav_button setHidden:YES];
     if (page_num == 0 && [[array_controller arrangedObjects] count] > 0 ) {
         return;
     }
