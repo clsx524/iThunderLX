@@ -48,5 +48,6 @@
 - (BOOL)thread_add_task:(NSString *)task_url;
 - (void)thread_delete_yunfile;
 - (void)clear_task_list;
+- (BOOL)thread_check_downloading;
 
 @end

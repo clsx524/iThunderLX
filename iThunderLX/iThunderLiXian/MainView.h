@@ -33,7 +33,6 @@
     IBOutlet NSToolbarItem *toobaritem_yundelete;
     NSString *hash;
     NSString *cookie;
-    //BOOL checkboxEnabled;
     
     MessageView *message_view;
     

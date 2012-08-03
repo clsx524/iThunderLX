@@ -24,4 +24,6 @@
 
 #define UD_VOD_PLAY_SHARPENESS "UserDefaultVodSharpness"
 
+#define UD_DOWNLOAD_AND_DELETE "UserDefaultDownloadAndDelete"
+
 #endif

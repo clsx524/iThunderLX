@@ -21,8 +21,7 @@
         // Initialization code here.
         current_page = 0;
         NSLog(@"%lu", [[NSUserDefaults standardUserDefaults] integerForKey:@UD_TASK_SPEED_LIMIT]);        
-    }
-    
+    }    
     return self;
 }
 
@@ -42,10 +41,8 @@
     if (self.hash && [self.hash length] == 32) {
         //自动登录
         [toobaritem_login setEnabled:NO];
-        [toobaritem_login setLabel:@"正在登录"];
-        
-        [toobaritem_login setLabel:@"注销"];
-        
+        [toobaritem_login setLabel:@"正在登录"];        
+        [toobaritem_login setLabel:@"注销"];        
         [message_view showMessage:@"正在加载任务列表。。。"];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
@@ -128,6 +125,7 @@
             
             current_page = 0;
             [tasks_view thread_get_task_list:0];
+            
             
         } else {
             dispatch_async( dispatch_get_main_queue(), ^{
@@ -216,8 +214,7 @@
     if (!self.hash || self.hash.length != 32) {
         [[NSAlert alertWithMessageText:@"无法加载更多任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户！"] runModal];
         return;
-    }
-    
+    }    
     
     current_page += 1;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
@@ -244,7 +241,6 @@
             [tasks_view thread_get_task_list:current_page];
             [message_view hideMessage];
         });
-        
     }
 }
 
@@ -258,16 +254,18 @@
         return;
     }
     
-    if (message_view.view.isHidden) {        
-        [message_view showMessage:@"正在删除云端任务。。。"];
+    if (message_view.view.isHidden) {
+
         [tasks_view thread_delete_yunfile];
-        [tasks_view clear_task_list];
-        current_page = 0;
-        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-            [tasks_view thread_get_task_list:current_page];
+        if (![tasks_view thread_check_downloading]) {
+            [message_view showMessage:@"正在删除云端任务。。。"];
+            [tasks_view clear_task_list];
+            current_page = 0;
+            dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+                [tasks_view thread_get_task_list:current_page];
             [message_view hideMessage];
-        });
-        
+            });
+        }
     }
 }
 

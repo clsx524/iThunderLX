@@ -101,8 +101,7 @@
     
     NSString *requestResult = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/%@/get_task_list/%lu/0",self.hash, (page_num+1) * 20]];
     
-    if ([requestResult isEqualToString:@"Fail"])
-    {
+    if ([requestResult isEqualToString:@"FAIL"])  {
         return;
     }
     
@@ -288,6 +287,9 @@
            delete_files_list = tt.TaskID;
            request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, delete_files_list];
            requestResult = [RequestSender postRequest:request_url withBody:request_data];
+           tt.TaskLiXianProcess = @"已从云端删除该任务";
+           tt.ButtonTitle = @"已删除该云端任务";
+           
         }
     }
 }
@@ -311,11 +313,14 @@
         }
     }
     
+    if ([t.ButtonTitle isEqualToString:@"已删除该云端任务"]) {
+        [[NSAlert alertWithMessageText:@"无法下载任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"该云端离线任务已被删除，无法下载到本地，请重新添加任务。"] runModal];
+        return;
+    }
+    
     
     if ([t.ButtonTitle isEqualToString:@"开始本地下载"] || [t.ButtonTitle isEqualToString:@"继续下载"])
-    {
-        
-        
+    {     
         //下载文件
         t.LeftTimeButtonHidden = NO;
         if ([t.TaskTypeString isEqualToString:@"bt"]) { //BT任务，下载全部文件
@@ -327,7 +332,7 @@
         if (![t.TaskLiXianProcess hasSuffix:@"100.00%"])
         {
             t.LeftTimeButtonHidden = YES;    
-            [[NSAlert alertWithMessageText:@"无法下载任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"远端离线任务尚未下载完成，无法下载到本地，请等待完成后重试。"] runModal];
+            [[NSAlert alertWithMessageText:@"无法下载任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"云端离线任务尚未下载完成，无法下载到本地，请等待完成后重试。"] runModal];
             
             return;
         }
@@ -350,7 +355,7 @@
         return;
     }
     
-    if (t.FatherTaskModel && [t.FatherTaskModel.TaskTypeString isEqualToString:@"正在下载中"]) {
+    if (t.FatherTaskModel && [t.FatherTaskModel.ButtonTitle isEqualToString:@"正在下载中"]) {
         //暂停下载
         t.Indeterminate = YES;
         t.LeftTimeButtonHidden = YES;
@@ -374,6 +379,7 @@
             save_path = @"~/Downloads";
         }
         save_path = [save_path stringByExpandingTildeInPath];
+  
         BOOL isExist;
         if (!t.FatherTitle) {
             isExist = [[NSWorkspace sharedWorkspace] selectFile:[NSString stringWithFormat:@"%@/%@",save_path, t.TaskTitle] inFileViewerRootedAtPath:@""];
@@ -384,6 +390,19 @@
             t.ButtonTitle = @"开始本地下载";
         }
     }
+}
+
+//--------------------------------------------------------------
+//      线程：状态检查
+//--------------------------------------------------------------
+-(BOOL) thread_check_downloading
+{
+    for (TaskModel *tt in [array_controller arrangedObjects]) {
+        if ([tt.ButtonTitle isEqualToString:@"正在下载中"] || [tt.ButtonTitle hasSuffix:@"Bs"]) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 //--------------------------------------------------------------
@@ -400,13 +419,19 @@
     for (TaskModel *tt in [array_controller arrangedObjects]) {
         if ([tt.TaskID isEqualToString:[button toolTip]]) {
             t = tt;
+            if (button.state) {
+                t.YunDelete = YES;
+                if (t.FatherTitle) {
+                    [[NSAlert alertWithMessageText:@"警告" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"无法删除bt任务中的文件，请等待后续版本支持。"] runModal];
+                    t.YunDelete = NO;
+                    button.state = NO;
+                }
+                
+            } else {
+                t.YunDelete = NO;
+            }
             break;
         }
-    }
-    if (button.state) {
-        t.YunDelete = YES;
-    } else {
-        t.YunDelete = NO;
     }
 }
 
@@ -567,10 +592,10 @@
          
          */
         NSString *play_url = [[jsonArray objectAtIndex:[jsonArray count] -1/*0*/] objectForKey:@"vod_url"];// 高清;
-        /*if ([[NSUserDefaults standardUserDefaults] integerForKey:@UD_VOD_PLAY_SHARPENESS] == 1) {
+        if ([[NSUserDefaults standardUserDefaults] integerForKey:@UD_VOD_PLAY_SHARPENESS] == 1) {
             NSLog(@"biaoqin");
             play_url = [[jsonArray objectAtIndex:0] objectForKey:@"vod_url"];  //标清
-        }*/
+        }
         
         play_url = [play_url stringByReplacingOccurrencesOfString:@"&p=" withString:@"&"];
         NSString *play_url_2 = [play_url substringFromIndex:[play_url rangeOfString:@"&s"].location + 3];
@@ -685,5 +710,10 @@
 {
     [array_controller removeObjects:[array_controller arrangedObjects]];
     [mutable_array removeAllObjects];
+    if (!nav_button.isHidden) {
+        [nav_button setHidden:YES];
+        [nav_image setImage:nil];
+        [nav_label setStringValue:@""];  
+    }
 }
 @end

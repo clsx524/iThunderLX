@@ -8,8 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "DownloadOperation.h"
+#import "RequestSender.h"
+#import "TasksView.h"
 
 @class DownloadOperation;
+@class TasksView;
 @interface TaskModel : NSObject {
     NSString *TaskTitle;
     NSString *FatherTitle;
@@ -30,6 +33,7 @@
     NSString *CID;
     NSString *ButtonTitle;
     TaskModel *FatherTaskModel;
+    TasksView *tasks_view;
     
     BOOL ButtonEnabled;
     BOOL LeftTimeButtonHidden;

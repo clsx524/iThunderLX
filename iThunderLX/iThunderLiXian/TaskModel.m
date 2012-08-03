@@ -292,6 +292,7 @@
         switch ([task terminationStatus]) {
                 
             case 0:
+            {
                 //下载完成
                 if (self.FatherTaskModel) {
                     //处理BT主任务的进度
@@ -302,7 +303,9 @@
                     last_download_size = self.TaskSize;
                     father_task.TaskDownloadedSize += last_download_size;
                     father_task.ProgressValue = father_task.TaskDownloadedSize / (float)father_task.TaskSize * 100;
-                    
+                    if (father_task.ProgressValue == 100) {
+                        father_task.ButtonTitle = @"完成下载";
+                    }
                 }
                 
                 self.ButtonEnabled = YES;
@@ -313,8 +316,25 @@
                     self.FatherTaskModel.LeftTimeButtonHidden = YES;
                     self.FatherTaskModel.ButtonTitle = @"完成下载";
                 }
+                NSString *request_url = @"http://127.0.0.1:9999/task_delete";
+                NSString *request_data = @"";
+                NSString *requestResult;
+                
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                if ([defaults integerForKey:@UD_DOWNLOAD_AND_DELETE] == 1) {
+                    if (self.FatherTitle && self.ProgressValue == 100) {
+                        request_data = [NSString stringWithFormat:@"hash=%@&tid=%@",tasks_view.hash,self.FatherTaskModel.TaskID];
+                    } else if (!self.FatherTitle) {
+                        request_data = [NSString stringWithFormat:@"hash=%@&tid=%@",tasks_view.hash,self.TaskID];
+                    }
+                }                
+                requestResult = [RequestSender postRequest:request_url withBody:request_data];
+            }
+                
                 break;
+                
             case 7:
+            {
                 //结束/删除
                 if (NeedToRestartNow) {
                     self.ButtonEnabled = YES;
@@ -342,6 +362,7 @@
                         self.FatherTaskModel.indeterminate = YES;
                     }
                 }
+            }
                 break;
                 
             default:
