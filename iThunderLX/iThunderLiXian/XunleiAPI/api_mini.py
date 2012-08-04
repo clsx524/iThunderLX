@@ -103,6 +103,24 @@ class GetTaskListHandler(tornado.web.RequestHandler):
 		tasklist_json = json.dumps(tasklist)
 		self.write(tasklist_json)
 
+class AddBTTaskHandler(tornado.web.RequestHandler):
+	def get(self, hash, path):
+		self.write("POST HERE")
+    
+	def post(self):
+		hash = self.get_argument("hash")
+		path = self.get_argument("path")
+		isLogin = check_login(hash)
+		if not isLogin:
+			self.write("LFail")
+			self.finish()
+			return
+        
+		lixianAPI = lixianAPIs.get(hash)
+		if lixianAPI.add_bt_task_by_path(path):
+			self.write("Success")
+		else:
+			self.write("ADDFail")
 
 class AddTaskHandler(tornado.web.RequestHandler):
 	def get(self, hash, url):
@@ -196,8 +214,9 @@ application = tornado.web.Application([
 	(r'/initial/(.*)/(.*)', InitialHandler),  #API 1
 	(r'/([A-Za-z0-9]{32})/get_task_list/([0-9]*)/([0-9]*)', GetTaskListHandler), #API 2
 	(r'/add_task', AddTaskHandler), #API 3
-    (r'/task_delete',DeleteTaskHandler), #API 4
-	(r'/([A-Za-z0-9]{32})/get_bt_list/(.*)/(.*)', GetBTListHandler), #API 5 TID CID
+    (r'/add_torrent_task', AddBTTaskHandler), #API 4
+    (r'/task_delete',DeleteTaskHandler), #API 5
+	(r'/([A-Za-z0-9]{32})/get_bt_list/(.*)/(.*)', GetBTListHandler), #API 6 TID CID
 	(r'/([A-Za-z0-9]{32})/get_cookie',  GetCookieHandler),
 	(r'/vod_get_play_url', VodGetPlayUrl),
 	(r'(.*)', ZeroHandler),  #API Zero

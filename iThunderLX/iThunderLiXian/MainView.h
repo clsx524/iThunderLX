@@ -22,6 +22,7 @@
     IBOutlet NSTextField *login_password;
     IBOutlet NSProgressIndicator *login_progress;
     IBOutlet NSButton *login_ok_button;
+    IBOutlet NSButton *button_add_bt_task;
     IBOutlet NSWindow *add_task_window;
     IBOutlet NSProgressIndicator *add_task_progress;
     IBOutlet NSButton *add_task_ok_button;

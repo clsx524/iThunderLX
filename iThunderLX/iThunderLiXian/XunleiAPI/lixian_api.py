@@ -1,7 +1,7 @@
 #encoding: utf8
 #author: binux<17175297.hk@gmail.com>
 #edited by MartianZ<fzyadmin@gmail.com>
-#Edited by Eric <clsx524@gmail.com>
+#edited by Eric <clsx524@gmail.com>
 
 import re
 import time
@@ -14,10 +14,15 @@ from random import random, sample
 from urlparse import urlparse
 from pprint import pformat
 from jsfunctionParser import parser_js_function_call
-from urllib import urlencode
+import urllib
 import urllib2
 import logging
 import cookielib
+import os.path
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
  
 DEBUG = logging.debug
 
@@ -201,8 +206,8 @@ class LiXianAPI(object):
                     format=r["openformat"],
                   )
             result.append(tmp)
-        return result
-
+        return result    
+    
     QUERY_URL = "http://dynamic.cloud.vip.xunlei.com/interface/url_query"
     def bt_task_check(self, url):
         r = self.session.get(self.QUERY_URL, params={

@@ -21,7 +21,7 @@
         // Initialization code here.
         current_page = 0;
         NSLog(@"%lu", [[NSUserDefaults standardUserDefaults] integerForKey:@UD_TASK_SPEED_LIMIT]);        
-    }    
+    }
     return self;
 }
 
@@ -34,6 +34,8 @@
     
     [self.window.contentView addSubview:tasks_view.view];
     [self.window.contentView addSubview:message_view.view];
+    
+    [tasks_view thread_nav_button_Hidden:YES];
     
     self.hash = [[NSUserDefaults standardUserDefaults] objectForKey:@UD_LAST_LOGIN_HASH];
     self.cookie = [[NSUserDefaults standardUserDefaults] objectForKey:@UD_LAST_LOGIN_COOKIE];
@@ -139,6 +141,46 @@
 }
 
 //----------------------------------------
+//   登录窗口 - 添加BT任务
+//----------------------------------------
+- (IBAction)button_add_bt_task:(id)sender
+{
+    
+    if (!self.hash || self.hash.length != 32) {
+        [[NSAlert alertWithMessageText:@"无法删除云端任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户！"] runModal];
+        return;
+    }
+    [NSApp endSheet:add_task_window returnCode:NSCancelButton];
+    NSString *request_url = @"http://127.0.0.1:9999/add_torrent_task";
+    __block NSString *request_data;
+    __block NSString *requestResult;
+    __block NSString *bt_path;
+    
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setCanChooseFiles:YES];
+    [panel setCanChooseDirectories:NO];
+    [panel setAllowsMultipleSelection:NO];
+    [panel setMessage:@"请选择BT文件地址."];
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
+        [button_add_bt_task setEnabled:NO];
+        if (result == NSFileHandlingPanelOKButton) {
+            NSURL *url = [panel URL];
+            bt_path = [url path];
+            
+            request_data = [NSString stringWithFormat:@"hash=%@&path=%@", self.hash, bt_path];
+            requestResult = [RequestSender postRequest:request_url withBody:request_data];
+        }
+        [message_view showMessage:@"正在刷新任务。。。"];
+        current_page = 0;
+        [tasks_view clear_task_list];
+        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+            [tasks_view thread_get_task_list:current_page];
+            [message_view hideMessage];
+        });
+    }];
+}
+
+//----------------------------------------
 //   SHEET - 关闭
 //----------------------------------------
 - (void)sheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
@@ -164,7 +206,7 @@
         [[NSAlert alertWithMessageText:@"无法添加任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户，再添加任务！"] runModal];
         return;
     }
-    
+    [button_add_bt_task setEnabled:YES];
     [add_task_ok_button setEnabled:YES];
     [NSApp beginSheet:add_task_window modalForWindow:self.window modalDelegate:self didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 }
@@ -174,6 +216,7 @@
 //----------------------------------------
 -(IBAction)add_task_ok_button_click:(id)sender
 {
+    [button_add_bt_task setEnabled:NO];
     if ([[add_task_url stringValue] length]<5) {
         return;
     }
@@ -194,6 +237,7 @@
         }
         [add_task_progress stopAnimation:self];
         [add_task_url setStringValue:@""];
+        [button_add_bt_task setEnabled:YES];
     });
 }
 

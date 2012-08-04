@@ -49,5 +49,6 @@
 - (void)thread_delete_yunfile;
 - (void)clear_task_list;
 - (BOOL)thread_check_downloading;
+- (void)thread_nav_button_Hidden:(BOOL)state;
 
 @end

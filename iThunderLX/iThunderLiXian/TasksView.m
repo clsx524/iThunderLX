@@ -19,7 +19,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Initialization code here.
-        
+        [nav_button setHidden:YES];
         hash = [[NSString alloc] init];
         
         //--------------------------------------------------------------
@@ -40,7 +40,6 @@
         
         message_view = [[MessageView alloc]initWithNibName:@"MessageView" bundle:[NSBundle bundleForClass:[self class]] TasksView:self];
         [collection setValue:@(0) forKey:@"_animationDuration"];
-        [nav_button setHidden:YES];
     }
     return self;
 }
@@ -226,6 +225,11 @@
     
 }
 
+- (void)thread_nav_button_Hidden:(BOOL)state;
+{
+    [nav_button setHidden:state];
+}
+
 //--------------------------------------------------------------
 //      线程：加载BT任务内容
 //--------------------------------------------------------------
@@ -272,6 +276,7 @@
             }
         }
         [nav_button setHidden:NO];
+        [collection setHidden:NO];
     }
 }
 
