@@ -146,8 +146,8 @@
 							</object>
 							<nil key="NSToolbarItemTarget"/>
 							<nil key="NSToolbarItemAction"/>
-							<string key="NSToolbarItemMinSize">{0, 0}</string>
-							<string key="NSToolbarItemMaxSize">{0, 0}</string>
+							<string key="NSToolbarItemMinSize">{5, 5}</string>
+							<string key="NSToolbarItemMaxSize">{5, 5}</string>
 							<bool key="NSToolbarItemEnabled">YES</bool>
 							<bool key="NSToolbarItemAutovalidates">YES</bool>
 							<int key="NSToolbarItemTag">-1</int>
@@ -513,7 +513,7 @@
 						<object class="NSTextField" id="607538154">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{85, 42}, {470, 43}}</string>
+							<string key="NSFrame">{{85, 52}, {502, 22}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="189231291"/>
@@ -535,7 +535,7 @@
 						<object class="NSButton" id="561716532">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{494, 6}, {89, 32}}</string>
+							<string key="NSFrame">{{504, 13}, {89, 32}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView"/>
@@ -560,7 +560,7 @@
 						<object class="NSButton" id="967823044">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{396, 6}, {89, 32}}</string>
+							<string key="NSFrame">{{398, 13}, {89, 32}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="561716532"/>
@@ -585,7 +585,7 @@
 						<object class="NSTextField" id="50288829">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{170, 93}, {388, 17}}</string>
+							<string key="NSFrame">{{178, 82}, {388, 17}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="518921973"/>
@@ -609,7 +609,7 @@
 						<object class="NSProgressIndicator" id="869425376">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{364, 15}, {16, 16}}</string>
+							<string key="NSFrame">{{364, 22}, {16, 16}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="967823044"/>
@@ -620,7 +620,7 @@
 						<object class="NSButton" id="189231291">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{79, 6}, {125, 32}}</string>
+							<string key="NSFrame">{{79, 13}, {125, 32}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="869425376"/>
@@ -629,7 +629,7 @@
 							<object class="NSButtonCell" key="NSCell" id="54060853">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">添加BT文件下载</string>
+								<string key="NSContents">添加BT下载任务</string>
 								<reference key="NSSupport" ref="773306348"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="189231291"/>
@@ -1505,13 +1505,13 @@
 						<int key="objectID">179</int>
 						<reference key="object" ref="59753985"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="967823044"/>
-							<reference ref="561716532"/>
-							<reference ref="869425376"/>
-							<reference ref="50288829"/>
-							<reference ref="607538154"/>
 							<reference ref="518921973"/>
+							<reference ref="607538154"/>
+							<reference ref="561716532"/>
+							<reference ref="967823044"/>
+							<reference ref="869425376"/>
 							<reference ref="189231291"/>
+							<reference ref="50288829"/>
 						</array>
 						<reference key="parent" ref="1004824840"/>
 					</object>
@@ -2043,7 +2043,7 @@
 			<string key="login">{311, 63}</string>
 			<string key="loginToolbarItem">{128, 128}</string>
 			<string key="newToolbarItem">{128, 128}</string>
-			<string key="reload">{128, 128}</string>
+			<string key="reload">{90, 90}</string>
 		</dictionary>
 	</data>
 </archive>

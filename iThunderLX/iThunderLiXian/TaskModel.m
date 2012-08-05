@@ -10,7 +10,6 @@
 
 @implementation TaskModel
 
-
 -(void)dealloc {
     self.TaskID = nil;
     self.TaskType = nil;
@@ -111,7 +110,6 @@
             //[#1 SIZE:0B/0B CN:1 SPD:0Bs]
             
             
-            
             errs = [errs stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             errs = [errs stringByReplacingOccurrencesOfString:@"/" withString:@" "];
             errs = [errs stringByReplacingOccurrencesOfString:@"(" withString:@" "];
@@ -162,7 +160,6 @@
                 self.ButtonEnabled = NO;
                 break;
             }
-            
         }
         while ([task isRunning]) {
             //DO NOTHING
@@ -316,21 +313,26 @@
                     self.FatherTaskModel.LeftTimeButtonHidden = YES;
                     self.FatherTaskModel.ButtonTitle = @"完成下载";
                 }
+                
                 NSString *request_url = @"http://127.0.0.1:9999/task_delete";
-                NSString *request_data = @"";
+                NSString *request_data;
                 NSString *requestResult;
-                
+
                 NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                NSLog(@"%ld",[defaults integerForKey:@UD_DOWNLOAD_AND_DELETE]);
                 if ([defaults integerForKey:@UD_DOWNLOAD_AND_DELETE] == 1) {
-                    if (self.FatherTitle && self.ProgressValue == 100) {
-                        request_data = [NSString stringWithFormat:@"hash=%@&tid=%@",tasks_view.hash,self.FatherTaskModel.TaskID];
-                    } else if (!self.FatherTitle) {
-                        request_data = [NSString stringWithFormat:@"hash=%@&tid=%@",tasks_view.hash,self.TaskID];
-                    }
-                }                
-                requestResult = [RequestSender postRequest:request_url withBody:request_data];
+                    NSLog(@"DELETING");
+                    if (!self.FatherTitle)
+                    {
+                        request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, self.TaskID];
+                    } else if (self.FatherTitle && self.ProgressValue == 100) {
+                        request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, self.FatherTaskModel.TaskID];
+                    }                 
+                    requestResult = [RequestSender postRequest:request_url withBody:request_data];
+                    self.TaskLiXianProcess = @"已从云端删除该任务";
+                    self.ButtonTitle = @"已删除该云端任务";
+                }
             }
-                
                 break;
                 
             case 7:
@@ -368,10 +370,7 @@
             default:
                 break;
         }
-        
     }
-    
-    
 }
 
 -(void)thread_delete_files
@@ -390,7 +389,6 @@
         file_path_orig = [NSString stringWithFormat:@"%@/%@/%@",file_path, self.FatherTitle, self.TaskTitle];
         file_path_father = [NSString stringWithFormat:@"%@/%@",file_path, self.FatherTitle];
         listOfFiles = [fileMngr contentsOfDirectoryAtPath:file_path_father error:nil];
-        
     }
     
     NSString *file_path_aria2 =[file_path_orig stringByAppendingPathExtension:@"aria2"];
@@ -407,6 +405,5 @@
         }
     }
 }
-
 
 @end

@@ -634,7 +634,7 @@ class LiXianAPI(object):
         else:
             return result
 
-    SHARE_URL = "http://dynamic.sendfile.vip.xunlei.com/interface/lixian_forwarding"
+    SHARE_URL = "http://kuai.xunlei.com/interface/lixian_forwarding"
     def share(self, emails, tasks, msg="", task_list=None):
         if task_list is None:
             task_list = self.get_task_list()

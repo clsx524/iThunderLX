@@ -123,6 +123,7 @@
                 [login_progress stopAnimation:self];
                 [NSApp endSheet:login_window returnCode:NSOKButton];
                 [toobaritem_login setLabel:@"注销"];
+                [toobaritem_login setEnabled:NO];
             });
             
             current_page = 0;

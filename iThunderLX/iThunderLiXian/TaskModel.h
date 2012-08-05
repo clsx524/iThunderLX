@@ -9,10 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "DownloadOperation.h"
 #import "RequestSender.h"
-#import "TasksView.h"
 
 @class DownloadOperation;
-@class TasksView;
+
 @interface TaskModel : NSObject {
     NSString *TaskTitle;
     NSString *FatherTitle;
@@ -22,7 +21,6 @@
     NSImage *TaskType;
     NSUInteger TaskSize;
     NSUInteger TaskDownloadedSize; //只有BT任务用来记录，其他时候忽略这个
-    NSString *Cookie;
     BOOL Indeterminate;
     BOOL YunDelete;
     NSInteger ProgressValue;
@@ -32,8 +30,11 @@
     NSString *TaskTypeString;
     NSString *CID;
     NSString *ButtonTitle;
+    
+    NSString *Cookie;
+    NSString *hash;
+    
     TaskModel *FatherTaskModel;
-    TasksView *tasks_view;
     
     BOOL ButtonEnabled;
     BOOL LeftTimeButtonHidden;
@@ -62,6 +63,7 @@
 @property (atomic) NSInteger ProgressValue;
 @property (atomic) NSUInteger TaskDownloadedSize;
 @property (atomic, retain) NSString *Cookie;
+@property (atomic, retain) NSString *hash;
 @property (atomic, retain) NSString *LiXianURL;
 @property (atomic, retain) NSString *TaskTypeString;
 @property (atomic, retain) NSString *CID;

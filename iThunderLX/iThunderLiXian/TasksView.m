@@ -81,7 +81,6 @@
             [array_controller removeObject:t];
             [array_controller insertObject:t atArrangedObjectIndex:0];
         });
-        
         return YES;
     } else {
         return NO;
@@ -201,6 +200,7 @@
     task.Indeterminate = YES;
     task.ProgressValue = 0;
     task.Cookie = [NSString stringWithFormat:@"Cookie:%@", self.cookie];
+    task.hash = self.hash;
     task.LiXianURL = [dict objectForKey:@"lixian_url"];
         
     task.CID = [NSString stringWithString:[dict objectForKey:@"cid"]];
@@ -285,6 +285,7 @@
 //--------------------------------------------------------------
 - (void) thread_delete_yunfile
 {
+    
     NSString *request_url = @"http://127.0.0.1:9999/task_delete";
     NSString *request_data;
     NSString *requestResult;
@@ -296,7 +297,6 @@
            requestResult = [RequestSender postRequest:request_url withBody:request_data];
            tt.TaskLiXianProcess = @"已从云端删除该任务";
            tt.ButtonTitle = @"已删除该云端任务";
-           
         }
     }
 }
@@ -332,6 +332,7 @@
         t.LeftTimeButtonHidden = NO;
         if ([t.TaskTypeString isEqualToString:@"bt"]) { //BT任务，下载全部文件
             t.StartAllDownloadNow = YES;
+            t.LeftTimeButtonHidden =YES;
             [NSThread detachNewThreadSelector:@selector(thread_load_bt_file_list:) toTarget:self withObject:t];
             return;
         }
@@ -340,7 +341,6 @@
         {
             t.LeftTimeButtonHidden = YES;    
             [[NSAlert alertWithMessageText:@"无法下载任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"云端离线任务尚未下载完成，无法下载到本地，请等待完成后重试。"] runModal];
-            
             return;
         }
         
@@ -348,7 +348,7 @@
         //[t start_download:button]; 采用线程池
         //operation_download_queue
         t.ButtonTitle = @"队列中...";
-        t.LeftTimeButtonHidden = YES;
+        t.LeftTimeButtonHidden = YES;     
         DownloadOperation *download_operation = [[DownloadOperation alloc] initWithTaskModel:t];
         [operation_download_queue addOperation:download_operation];
         t.download_operation = download_operation;
@@ -598,10 +598,13 @@
          }
          
          */
-        NSString *play_url = [[jsonArray objectAtIndex:[jsonArray count] -1/*0*/] objectForKey:@"vod_url"];// 高清;
+        NSString *play_url;        
         if ([[NSUserDefaults standardUserDefaults] integerForKey:@UD_VOD_PLAY_SHARPENESS] == 1) {
-            NSLog(@"biaoqin");
+            NSLog(@"biaoqing");
             play_url = [[jsonArray objectAtIndex:0] objectForKey:@"vod_url"];  //标清
+        } else {
+            NSLog(@"gaoqing");
+            play_url = [[jsonArray objectAtIndex:[jsonArray count] -1] objectForKey:@"vod_url"];// 高清;
         }
         
         play_url = [play_url stringByReplacingOccurrencesOfString:@"&p=" withString:@"&"];
