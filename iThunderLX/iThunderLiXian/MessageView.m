@@ -25,15 +25,15 @@
 }
 
 -(void) showMessage:(NSString *)message {
+    [tasks_view.view setHidden:YES];
     [message_label setStringValue:message];
     [message_progress startAnimation:self];
-    [tasks_view.view setHidden:YES];
     [self.view setHidden:NO];
 }
 
 -(void) hideMessage {
-    [message_progress startAnimation:self];
     [self.view setHidden:YES];
+    [message_progress startAnimation:self];
     [tasks_view.view setHidden:NO];
 }
 

@@ -5,7 +5,6 @@
 
 #import "RequestSender.h"
 
-
 @implementation RequestSender
 
 + (NSString*)sendRequest:(NSString*)url

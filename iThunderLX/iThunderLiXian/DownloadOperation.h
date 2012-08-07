@@ -10,6 +10,7 @@
 #import "TaskModel.h"
 
 @class TaskModel;
+
 @interface DownloadOperation : NSOperation {
     TaskModel *task;
     BOOL _isFinish;

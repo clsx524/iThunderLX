@@ -13,10 +13,7 @@
 #import "MessageView.h"
 
 @interface MainView : NSWindowController
-{
-    
-    TasksView *tasks_view;
-    
+{  
     IBOutlet NSWindow *login_window;
     IBOutlet NSTextField *login_username;
     IBOutlet NSTextField *login_password;
@@ -36,9 +33,9 @@
     NSString *cookie;
     
     MessageView *message_view;
+    TasksView *tasks_view;
     
-    int current_page;
-    
+    int current_page;    
 }
 @property (atomic) int current_page;
 @property (atomic, retain) NSString *hash;

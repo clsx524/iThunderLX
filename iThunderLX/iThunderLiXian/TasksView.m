@@ -17,8 +17,8 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Initialization code here.
+    if (self)
+    {
         [nav_button setHidden:YES];
         hash = [[NSString alloc] init];
         
@@ -51,7 +51,6 @@
 {
     NSLog(@"CHANGE MAX TASKS");
     [operation_download_queue setMaxConcurrentOperationCount:[[NSUserDefaults standardUserDefaults] integerForKey:@UD_MAX_TASKS]];
-    
 }
 
 //--------------------------------------------------------------
@@ -59,20 +58,27 @@
 //--------------------------------------------------------------
 -(BOOL)thread_add_task:(NSString *)task_url
 {
-    
-    NSString *encodedValue = (__bridge NSString*)CFURLCreateStringByAddingPercentEscapes(nil,(CFStringRef)task_url, nil,(CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
+    NSFileManager *fileMngr = [NSFileManager defaultManager];
     
     NSString *request_url = @"http://127.0.0.1:9999/add_task";
+    NSString *request_url_bt = @"http://127.0.0.1:9999/add_torrent_task";
     
-    NSString *request_data = [NSString stringWithFormat:@"hash=%@&url=%@", self.hash, encodedValue];
+    NSString *encodedValue;    
+    NSString *request_data;
+    NSString *requestResult;
     
-    NSString *requestResult = [RequestSender postRequest:request_url withBody:request_data];
-    
+    if ([fileMngr fileExistsAtPath:task_url]) {
+        request_data = [NSString stringWithFormat:@"hash=%@&path=%@", self.hash, task_url];
+        requestResult = [RequestSender postRequest:request_url_bt withBody:request_data];
+    } else
+    {
+        encodedValue = (__bridge NSString*)CFURLCreateStringByAddingPercentEscapes(nil,(CFStringRef)task_url, nil,(CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
+        request_data = [NSString stringWithFormat:@"hash=%@&url=%@", self.hash, encodedValue];
+        requestResult = [RequestSender postRequest:request_url withBody:request_data];
+    }    
     
     if ([requestResult isEqualToString:@"Success"]) {
         //添加任务成功
-        /*[array_controller removeObjects:[array_controller arrangedObjects]];
-         [self thread_get_task_list:0]; */ //这样会导致前面的下载进度丢失
         dispatch_async( dispatch_get_main_queue(), ^{
             [self mainthread_add_task_to_list:[self thread_get_first_task]];
             
@@ -87,17 +93,12 @@
     }
 }
 
-
-
 //--------------------------------------------------------------
 //      线程：获取任务列表，并自动添加到主界面
 //--------------------------------------------------------------
 - (void)thread_get_task_list:(NSInteger)page_num
 {
     [nav_button setHidden:YES];
-    if (page_num == 0 && [[array_controller arrangedObjects] count] > 0 ) {
-        return;
-    }
     
     NSString *requestResult = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/%@/get_task_list/%lu/0",self.hash, (page_num+1) * 20]];
     
@@ -111,8 +112,7 @@
     
     for (unsigned long i = page_num * 20; (i < (page_num + 1) * 20) && (i < [jsonArray count]); i++) {
         [self performSelectorOnMainThread:@selector(mainthread_add_task_to_list:) withObject:[jsonArray objectAtIndex:i] waitUntilDone:YES];
-    }
-    
+    }    
 }
 
 //--------------------------------------------------------------
@@ -152,7 +152,8 @@
      url = "bt://4324E224D5A4A797363660885936A7D8D1BB328F";
      }
      */
-    TaskModel *task = [[TaskModel alloc] init];
+    TaskModel *task = [[TaskModel alloc] init]; 
+    
     if ([dict objectForKey:@"dirtitle"]) {
         //BT子任务
         task.TaskTitle = [dict objectForKey:@"dirtitle"];
@@ -162,6 +163,16 @@
         task.TaskTitle = [dict objectForKey:@"taskname"];
         task.FatherTitle = nil;
         task.FatherTaskModel = nil;
+    }
+    
+    for (TaskModel *t in [array_controller arrangedObjects]) {
+        if ([task.TaskTitle isEqualToString:t.TaskTitle]) {
+            return;
+        } else if (task.FatherTitle) {
+            if ([task.TaskTitle isEqualToString:t.FatherTitle]) {
+                return;
+            }
+        }
     }
     
     float task_size = [[dict objectForKey:@"size"] floatValue];
@@ -219,10 +230,8 @@
             DownloadOperation *download_operation = [[DownloadOperation alloc] initWithTaskModel:task];
             [operation_download_queue addOperation:download_operation];
             task.download_operation = download_operation;
-        }
-        
-    }
-    
+        }        
+    }    
 }
 
 - (void)thread_nav_button_Hidden:(BOOL)state;
@@ -271,8 +280,7 @@
                 [mutable_dict setObject:dirtitle forKey:@"dirtitle"];
                 [mutable_dict setObject:t.TaskTitle forKey:@"fathertitle"];
                 [mutable_dict setObject:[NSNumber numberWithInteger:[mutable_array indexOfObject:t]] forKey:@"fathertaskmodel"];
-                [self performSelectorOnMainThread:@selector(mainthread_add_task_to_list:) withObject:mutable_dict waitUntilDone:YES];
-                
+                [self performSelectorOnMainThread:@selector(mainthread_add_task_to_list:) withObject:mutable_dict waitUntilDone:YES];                
             }
         }
         [nav_button setHidden:NO];
@@ -284,8 +292,7 @@
 //      线程：删除勾选文件
 //--------------------------------------------------------------
 - (void) thread_delete_yunfile
-{
-    
+{    
     NSString *request_url = @"http://127.0.0.1:9999/task_delete";
     NSString *request_data;
     NSString *requestResult;
@@ -297,6 +304,7 @@
            requestResult = [RequestSender postRequest:request_url withBody:request_data];
            tt.TaskLiXianProcess = @"已从云端删除该任务";
            tt.ButtonTitle = @"已删除该云端任务";
+           [array_controller removeObject:tt];
         }
     }
 }
@@ -324,7 +332,6 @@
         [[NSAlert alertWithMessageText:@"无法下载任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"该云端离线任务已被删除，无法下载到本地，请重新添加任务。"] runModal];
         return;
     }
-    
     
     if ([t.ButtonTitle isEqualToString:@"开始本地下载"] || [t.ButtonTitle isEqualToString:@"继续下载"])
     {     
@@ -388,10 +395,14 @@
         save_path = [save_path stringByExpandingTildeInPath];
   
         BOOL isExist;
+        
         if (!t.FatherTitle) {
             isExist = [[NSWorkspace sharedWorkspace] selectFile:[NSString stringWithFormat:@"%@/%@",save_path, t.TaskTitle] inFileViewerRootedAtPath:@""];
         } else {
             isExist = [[NSWorkspace sharedWorkspace] selectFile:[NSString stringWithFormat:@"%@/%@/%@",save_path, t.FatherTitle,t.TaskTitle] inFileViewerRootedAtPath:@""];
+        }
+        if (t.TaskLiXianProcess ==@"已从云端删除该任务" || t.FatherTaskModel.TaskLiXianProcess ==@"已从云端删除该任务") {
+            isExist = YES;
         }
         if (!isExist) {
             t.ButtonTitle = @"开始本地下载";
@@ -432,8 +443,7 @@
                     [[NSAlert alertWithMessageText:@"警告" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"无法删除bt任务中的文件，请等待后续版本支持。"] runModal];
                     t.YunDelete = NO;
                     button.state = NO;
-                }
-                
+                }                
             } else {
                 t.YunDelete = NO;
             }
@@ -441,7 +451,6 @@
         }
     }
 }
-
 
 //--------------------------------------------------------------
 //      按钮单击：获取更多功能
@@ -474,11 +483,9 @@
             if ([t.ButtonTitle hasSuffix:@"Bs"] || [t.ButtonTitle isEqualToString:@"完成下载"] || [t.ButtonTitle isEqualToString:@"开始本地下载"] || [t.ButtonTitle isEqualToString:@"继续下载"]) {
                 [[[task_menu itemArray] objectAtIndex:3] setHidden:NO];
             }
-            
             break;
         }
     }
-    
     
     NSRect frame = [(NSButton *)sender frame];
     NSPoint menuOrigin = [[(NSButton *)sender superview] convertPoint:NSMakePoint(frame.origin.x, frame.origin.y) toView:nil];
@@ -503,8 +510,8 @@
     @autoreleasepool {
         NSMenuItem *menu_item = (NSMenuItem *)sender;
         for (TaskModel *t in [array_controller arrangedObjects]) {
-            if ([t.TaskID isEqualToString:[menu_item toolTip]]) {
-                
+            if ([t.TaskID isEqualToString:[menu_item toolTip]])
+            {                
                 [NSThread detachNewThreadSelector:@selector(thread_load_bt_file_list:) toTarget:self withObject:t];
                 break;
             }
@@ -563,8 +570,7 @@
                 break;
             }
         }
-    }
-    
+    }    
 }
 
 -(void)thread_cloud_play:(TaskModel *)t

@@ -30,25 +30,19 @@
     self.ButtonEnabled = NO;
     self.ButtonTitle = @"准备中...";
     
-    //[NSThread detachNewThreadSelector:@selector(thread_aria2c) toTarget:self withObject:nil];
-    
-    [self thread_aria2c];
-    /* Since we are gonna set up an queue for the Download thread, it is not necessary to start a thread here*/
-    
+    [self thread_aria2c];   
 }
 
 -(void)thread_aria2c
 {
     @autoreleasepool {
-        NSUInteger last_download_size = 0;
-        
+        NSUInteger last_download_size = 0;        
         NSString *resourcesPath = [[NSBundle mainBundle] resourcePath];
         NSLog(@"%@",resourcesPath);
         NSString *exePath = [NSString stringWithFormat:@"%@/aria2c",resourcesPath];
         NSTask *task = [[NSTask alloc] init];
         [task setLaunchPath:exePath];
-        NSArray *args;
-        
+        NSArray *args;        
         
         NSString *save_path = [[NSUserDefaults standardUserDefaults] objectForKey:@UD_SAVE_PATH];
         NSInteger max_thread = [[NSUserDefaults standardUserDefaults] integerForKey:@UD_MAX_THREADS];
@@ -64,15 +58,13 @@
         }
         save_path = [save_path stringByExpandingTildeInPath];
         NSString *max_thread_str = [NSString stringWithFormat:@"%ld", max_thread];
-        NSString *max_speed_str = [NSString stringWithFormat:@"%ldK", max_speed];
-        
+        NSString *max_speed_str = [NSString stringWithFormat:@"%ldK", max_speed];        
         
         if (!self.FatherTitle) {
             args = [NSArray arrayWithObjects:@"--file-allocation=none",@"-c",@"-s",max_thread_str,@"-x",max_thread_str,@"-d",save_path,@"--out",self.TaskTitle, @"--max-download-limit", max_speed_str,@"--header", self.Cookie, self.LiXianURL, nil];
         } else {
             args = [NSArray arrayWithObjects:@"--file-allocation=none",@"-c",@"-s", max_thread_str,@"-x", max_thread_str, @"-d",save_path,@"--out",[NSString stringWithFormat:@"%@/%@",self.FatherTitle,self.TaskTitle], @"--max-download-limit", max_speed_str, @"--header", self.Cookie, self.LiXianURL, nil];
-        }
-        
+        }        
         
         [task setArguments:args];
         
@@ -82,8 +74,7 @@
         [task launch];
         
         char temp[1024];
-        char down[64], total[64], percentage[64], speed[64], lefttime[64];
-        
+        char down[64], total[64], percentage[64], speed[64], lefttime[64];        
         
         while (1) {
             sleep(1);
@@ -321,7 +312,6 @@
                 NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
                 NSLog(@"%ld",[defaults integerForKey:@UD_DOWNLOAD_AND_DELETE]);
                 if ([defaults integerForKey:@UD_DOWNLOAD_AND_DELETE] == 1) {
-                    NSLog(@"DELETING");
                     if (!self.FatherTitle)
                     {
                         request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, self.TaskID];
@@ -329,8 +319,12 @@
                         request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, self.FatherTaskModel.TaskID];
                     }                 
                     requestResult = [RequestSender postRequest:request_url withBody:request_data];
-                    self.TaskLiXianProcess = @"已从云端删除该任务";
-                    self.ButtonTitle = @"已删除该云端任务";
+                    self.ButtonTitle = @"完成下载";
+                    self.TaskLiXianProcess =@"已从云端删除该任务";
+                    if (self.FatherTitle) {
+                        self.FatherTaskModel.ButtonTitle =@"完成下载";
+                        self.FatherTaskModel.TaskLiXianProcess =@"已从云端删除该任务";
+                    }  
                 }
             }
                 break;
@@ -338,30 +332,29 @@
             case 7:
             {
                 //结束/删除
+                self.ButtonEnabled = YES;
+                self.LeftTimeButtonHidden = YES;
+                if (self.FatherTaskModel) {
+                    self.FatherTaskModel.LeftTimeButtonHidden = YES;
+                    self.FatherTaskModel.indeterminate = YES;
+                }
+                
                 if (NeedToRestartNow) {
-                    self.ButtonEnabled = YES;
-                    self.LeftTimeButtonHidden = YES;
                     self.ButtonTitle = @"开始本地下载";
                     self.ProgressValue = 0;
                     NeedToRestartNow = NO;
                     if (self.FatherTaskModel) {
-                        self.FatherTaskModel.LeftTimeButtonHidden = YES;
                         self.FatherTaskModel.ButtonTitle = @"开始本地下载";
-                        self.FatherTaskModel.indeterminate = YES;
                     }
                     [self thread_delete_files];
                 }
                 if (NeedToStopNow)
                 {
                     //暂停下载
-                    self.ButtonEnabled = YES;
-                    self.LeftTimeButtonHidden = YES;
                     self.ButtonTitle = @"继续下载";
                     NeedToStopNow = NO;
                     if (self.FatherTaskModel) {
-                        self.FatherTaskModel.LeftTimeButtonHidden = YES;
                         self.FatherTaskModel.ButtonTitle = @"继续下载";
-                        self.FatherTaskModel.indeterminate = YES;
                     }
                 }
             }

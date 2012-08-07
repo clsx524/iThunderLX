@@ -35,6 +35,4 @@
     return _isFinish;
 }
 
-
-
 @end

@@ -18,7 +18,6 @@
 {
     self = [super initWithWindow:window];
     if (self) {
-        // Initialization code here.
         current_page = 0;
         NSLog(@"%lu", [[NSUserDefaults standardUserDefaults] integerForKey:@UD_TASK_SPEED_LIMIT]);        
     }
@@ -127,8 +126,7 @@
             });
             
             current_page = 0;
-            [tasks_view thread_get_task_list:0];
-            
+            [tasks_view thread_get_task_list:0];            
             
         } else {
             dispatch_async( dispatch_get_main_queue(), ^{
@@ -146,15 +144,11 @@
 //----------------------------------------
 - (IBAction)button_add_bt_task:(id)sender
 {
-    
     if (!self.hash || self.hash.length != 32) {
         [[NSAlert alertWithMessageText:@"无法删除云端任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户！"] runModal];
         return;
     }
     [NSApp endSheet:add_task_window returnCode:NSCancelButton];
-    NSString *request_url = @"http://127.0.0.1:9999/add_torrent_task";
-    __block NSString *request_data;
-    __block NSString *requestResult;
     __block NSString *bt_path;
     
     NSOpenPanel *panel = [NSOpenPanel openPanel];
@@ -167,17 +161,14 @@
         if (result == NSFileHandlingPanelOKButton) {
             NSURL *url = [panel URL];
             bt_path = [url path];
-            
-            request_data = [NSString stringWithFormat:@"hash=%@&path=%@", self.hash, bt_path];
-            requestResult = [RequestSender postRequest:request_url withBody:request_data];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+                if (![tasks_view thread_add_task:bt_path]) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[NSAlert alertWithMessageText:@"添加BT任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"添加任务失败，请确定您的BT文件正确并且不是中文文件名后重试。"] runModal];
+                    });
+                }
+            });
         }
-        [message_view showMessage:@"正在刷新任务。。。"];
-        current_page = 0;
-        [tasks_view clear_task_list];
-        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-            [tasks_view thread_get_task_list:current_page];
-            [message_view hideMessage];
-        });
     }];
 }
 
@@ -281,7 +272,9 @@
     if (message_view.view.isHidden) {
         [message_view showMessage:@"正在刷新任务。。。"];
         current_page = 0;
-        [tasks_view clear_task_list];
+        if (![tasks_view thread_check_downloading]) {
+            [tasks_view clear_task_list];
+        }
         dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
             [tasks_view thread_get_task_list:current_page];
             [message_view hideMessage];
@@ -300,17 +293,18 @@
     }
     
     if (message_view.view.isHidden) {
-
+        [message_view showMessage:@"正在删除云端任务。。。"];
         [tasks_view thread_delete_yunfile];
-        if (![tasks_view thread_check_downloading]) {
-            [message_view showMessage:@"正在删除云端任务。。。"];
+        
+        if (![tasks_view thread_check_downloading])
+        {            
             [tasks_view clear_task_list];
             current_page = 0;
             dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
                 [tasks_view thread_get_task_list:current_page];
-            [message_view hideMessage];
             });
         }
+        [message_view hideMessage];
     }
 }
 

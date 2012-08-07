@@ -5,7 +5,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface RequestSender : NSObject {
 
 }

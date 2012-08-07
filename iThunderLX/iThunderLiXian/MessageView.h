@@ -8,7 +8,6 @@
 #import <Cocoa/Cocoa.h>
 #import "TasksView.h"
 
-
 @class TasksView;
 @interface MessageView : NSViewController {
     IBOutlet NSTextField *message_label;
