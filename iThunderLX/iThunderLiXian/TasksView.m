@@ -81,11 +81,6 @@
         //添加任务成功
         dispatch_async( dispatch_get_main_queue(), ^{
             [self mainthread_add_task_to_list:[self thread_get_first_task]];
-            
-            TaskModel *t = [[array_controller arrangedObjects] lastObject];
-            //[t retain];
-            [array_controller removeObject:t];
-            [array_controller insertObject:t atArrangedObjectIndex:0];
         });
         return YES;
     } else {
@@ -129,8 +124,10 @@
     
     NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:[requestResult dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers|NSJSONReadingAllowFragments error:nil];
     
-    return [jsonArray objectAtIndex:0];
-    
+    //return [jsonArray objectAtIndex:0];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:[jsonArray objectAtIndex:0]];
+    [dict setObject:@"1" forKey:@"AddToTop"];
+    return dict;    
 }
 
 //--------------------------------------------------------------
@@ -219,7 +216,11 @@
     task.ButtonEnabled = YES;
     task.LeftDownloadTime = @"剩余下载时间:未知";
     task.LeftTimeButtonHidden = YES;
-    [array_controller addObject:task];
+    if ([dict objectForKey:@"AddToTop"]) {
+        [array_controller insertObject:task atArrangedObjectIndex:0];
+    } else {
+        [array_controller addObject:task];
+    }
     
     if (task.FatherTaskModel && task.FatherTaskModel.StartAllDownloadNow) {
         
@@ -234,9 +235,10 @@
     }    
 }
 
-- (void)thread_nav_button_Hidden:(BOOL)state;
+- (void)thread_button_config:(BOOL)state;
 {
     [nav_button setHidden:state];
+    [leftTimeButton setEnabled:NO];
 }
 
 //--------------------------------------------------------------
@@ -306,6 +308,31 @@
            tt.ButtonTitle = @"已删除该云端任务";
            [array_controller removeObject:tt];
         }
+    }
+}
+
+//--------------------------------------------------------------
+//      线程：刷新
+//--------------------------------------------------------------
+- (void) thread_refresh
+{
+    if (!nav_button.isHidden) {
+        return;
+    }
+    NSString *requestResult = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/%@/get_task_list/20/0",self.hash]];
+    
+    if ([requestResult isEqualToString:@"Fail"]) {
+        return;
+    }
+    
+    NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:[requestResult dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers|NSJSONReadingAllowFragments error:nil];
+    
+    NSLog(@"%@",[jsonArray objectAtIndex:0]);
+    
+    for (unsigned long i = 0; (i < 20) && (i < [jsonArray count]); i++) {
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:[jsonArray objectAtIndex:i]];
+        [dict setObject:@"1" forKey:@"AddToTop"];
+        [self performSelectorOnMainThread:@selector(mainthread_add_task_to_list:) withObject:dict waitUntilDone:YES];
     }
 }
 
@@ -415,12 +442,16 @@
 //--------------------------------------------------------------
 -(BOOL) thread_check_downloading
 {
+    BOOL state = NO;
     for (TaskModel *tt in [array_controller arrangedObjects]) {
+        if ([tt.TaskLiXianProcess isEqualToString:@"已从云端删除该任务"]) {
+            [array_controller removeObject:tt];
+        }
         if ([tt.ButtonTitle isEqualToString:@"正在下载中"] || [tt.ButtonTitle hasSuffix:@"Bs"]) {
-            return YES;
+            state = YES;
         }
     }
-    return NO;
+    return state;
 }
 
 //--------------------------------------------------------------

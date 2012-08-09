@@ -28,6 +28,7 @@
     IBOutlet NSButton *nav_button;
     
     IBOutlet NSButton *check_for_delete;
+    IBOutlet NSButton *leftTimeButton;
 
     NSOperationQueue *operation_download_queue;
     NSMutableArray *mutable_array;
@@ -49,6 +50,7 @@
 - (void)thread_delete_yunfile;
 - (void)clear_task_list;
 - (BOOL)thread_check_downloading;
-- (void)thread_nav_button_Hidden:(BOOL)state;
+- (void)thread_button_config:(BOOL)state;
+- (void)thread_refresh;
 
 @end

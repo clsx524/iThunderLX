@@ -34,7 +34,7 @@
     [self.window.contentView addSubview:tasks_view.view];
     [self.window.contentView addSubview:message_view.view];
     
-    [tasks_view thread_nav_button_Hidden:YES];
+    [tasks_view thread_button_config:YES];
     
     self.hash = [[NSUserDefaults standardUserDefaults] objectForKey:@UD_LAST_LOGIN_HASH];
     self.cookie = [[NSUserDefaults standardUserDefaults] objectForKey:@UD_LAST_LOGIN_COOKIE];
@@ -115,14 +115,15 @@
             tasks_view.cookie = self.cookie;
             
             //自动登录
+            [toobaritem_login setEnabled:NO];
             [[NSUserDefaults standardUserDefaults] setObject:self.hash forKey:@UD_LAST_LOGIN_HASH];
             [[NSUserDefaults standardUserDefaults] setObject:self.cookie forKey:@UD_LAST_LOGIN_COOKIE];
             
             dispatch_async( dispatch_get_main_queue(), ^{
+                [toobaritem_login setEnabled:NO];
                 [login_progress stopAnimation:self];
                 [NSApp endSheet:login_window returnCode:NSOKButton];
                 [toobaritem_login setLabel:@"注销"];
-                [toobaritem_login setEnabled:NO];
             });
             
             current_page = 0;
@@ -271,12 +272,11 @@
     
     if (message_view.view.isHidden) {
         [message_view showMessage:@"正在刷新任务。。。"];
-        current_page = 0;
         if (![tasks_view thread_check_downloading]) {
             [tasks_view clear_task_list];
-        }
+        } 
         dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-            [tasks_view thread_get_task_list:current_page];
+            [tasks_view thread_refresh];
             [message_view hideMessage];
         });
     }
@@ -295,16 +295,10 @@
     if (message_view.view.isHidden) {
         [message_view showMessage:@"正在删除云端任务。。。"];
         [tasks_view thread_delete_yunfile];
-        
-        if (![tasks_view thread_check_downloading])
-        {            
-            [tasks_view clear_task_list];
-            current_page = 0;
-            dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-                [tasks_view thread_get_task_list:current_page];
-            });
-        }
-        [message_view hideMessage];
+        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+            [tasks_view thread_refresh];
+            [message_view hideMessage];
+        });        
     }
 }
 

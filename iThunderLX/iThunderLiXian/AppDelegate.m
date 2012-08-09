@@ -37,14 +37,14 @@
     main_view = [[MainView alloc] initWithWindowNibName:@"MainView"];
     [main_view showWindow:self];
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-        NSString *check_update = [RequestSender sendRequest:@"http://api.4321.la/analytics-thunder.php?ver=20120730"];
-        dispatch_async( dispatch_get_main_queue(), ^{
-            if ([check_update hasPrefix:@"Update"]) {
-                [[NSAlert alertWithMessageText:@"更新" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"软件检测到fakeThunder有新版本的发布."] runModal];
-            }
-        });
-    });
+    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+    //    NSString *check_update = [RequestSender sendRequest:@"http://api.4321.la/analytics-thunder.php?ver=20120730"];
+    //    dispatch_async( dispatch_get_main_queue(), ^{
+    //        if ([check_update hasPrefix:@"Update"]) {
+    //            [[NSAlert alertWithMessageText:@"更新" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"软件检测到fakeThunder有新版本的发布."] runModal];
+   //         }
+    //    });
+   // });
     
     /*广告～*/
     

@@ -26,4 +26,6 @@
 
 #define UD_DOWNLOAD_AND_DELETE "UserDefaultDownloadAndDelete"
 
+#define UD_NOTIFICATION "UserDefaultSendNotification"
+
 #endif

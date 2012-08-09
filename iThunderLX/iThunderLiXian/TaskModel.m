@@ -310,7 +310,14 @@
                 NSString *requestResult;
 
                 NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                NSLog(@"%ld",[defaults integerForKey:@UD_DOWNLOAD_AND_DELETE]);
+                if ([defaults boolForKey:@UD_NOTIFICATION]) {
+                    NSUserNotification *unoti = [[NSUserNotification alloc] init];
+                    [unoti setTitle:@"iThunderLX - 下载完成"];
+                    [unoti setInformativeText:self.TaskTitle];
+                    [unoti setHasActionButton:NO];
+                    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:unoti];
+                }            
+                
                 if ([defaults integerForKey:@UD_DOWNLOAD_AND_DELETE] == 1) {
                     if (!self.FatherTitle)
                     {
@@ -320,10 +327,10 @@
                     }                 
                     requestResult = [RequestSender postRequest:request_url withBody:request_data];
                     self.ButtonTitle = @"完成下载";
-                    self.TaskLiXianProcess =@"已从云端删除该任务";
+                    self.TaskLiXianProcess = @"已从云端删除该任务";
                     if (self.FatherTitle) {
-                        self.FatherTaskModel.ButtonTitle =@"完成下载";
-                        self.FatherTaskModel.TaskLiXianProcess =@"已从云端删除该任务";
+                        self.FatherTaskModel.ButtonTitle = @"完成下载";
+                        self.FatherTaskModel.TaskLiXianProcess = @"已从云端删除该任务";
                     }  
                 }
             }
