@@ -322,7 +322,7 @@
                     if (!self.FatherTitle)
                     {
                         request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, self.TaskID];
-                    } else if (self.FatherTitle && self.ProgressValue == 100) {
+                    } else if (self.FatherTitle && self.FatherTaskModel.ProgressValue == 100) {
                         request_data = [NSString stringWithFormat:@"hash=%@&tid=%@", self.hash, self.FatherTaskModel.TaskID];
                     }                 
                     requestResult = [RequestSender postRequest:request_url withBody:request_data];
