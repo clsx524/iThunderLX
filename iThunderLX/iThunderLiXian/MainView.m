@@ -19,7 +19,7 @@
     self = [super initWithWindow:window];
     if (self) {
         current_page = 0;
-        NSLog(@"%lu", [[NSUserDefaults standardUserDefaults] integerForKey:@UD_TASK_SPEED_LIMIT]);        
+        NSLog(@"%lu", [[NSUserDefaults standardUserDefaults] integerForKey:@UD_TASK_SPEED_LIMIT]);
     }
     return self;
 }
@@ -27,7 +27,7 @@
 - (void)windowDidLoad
 {
     [super windowDidLoad];
-
+    
     tasks_view = [[TasksView alloc] initWithNibName:@"TasksView" bundle:[NSBundle bundleForClass:[self class]]];
     message_view = [[MessageView alloc] initWithNibName:@"MessageView" bundle:[NSBundle bundleForClass:[self class]] TasksView:tasks_view];
     
@@ -42,8 +42,8 @@
     if (self.hash && [self.hash length] == 32) {
         //自动登录
         [toobaritem_login setEnabled:NO];
-        [toobaritem_login setLabel:@"正在登录"];        
-        [toobaritem_login setLabel:@"注销"];        
+        [toobaritem_login setLabel:@"正在登录"];
+        [toobaritem_login setLabel:@"注销"];
         [message_view showMessage:@"正在加载任务列表。。。"];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
@@ -105,7 +105,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
         NSString *requestResult = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/initial/%@/%@",username, encodedPassword]];
-
+        
         if (![login_window isVisible]) { [toobaritem_login setEnabled:YES]; return; }
         if ([requestResult length] == 32) {
             //LOGIN SUCCESS
@@ -127,7 +127,7 @@
             });
             
             current_page = 0;
-            [tasks_view thread_get_task_list:0];            
+            [tasks_view thread_get_task_list:0];
             
         } else {
             dispatch_async( dispatch_get_main_queue(), ^{
@@ -251,7 +251,7 @@
     if (!self.hash || self.hash.length != 32) {
         [[NSAlert alertWithMessageText:@"无法加载更多任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户！"] runModal];
         return;
-    }    
+    }
     
     current_page += 1;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
@@ -274,7 +274,7 @@
         [message_view showMessage:@"正在刷新任务。。。"];
         if (![tasks_view thread_check_downloading]) {
             [tasks_view clear_task_list];
-        } 
+        }
         dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
             [tasks_view thread_refresh];
             [message_view hideMessage];
@@ -293,12 +293,12 @@
     }
     
     if (message_view.view.isHidden) {
-        [message_view showMessage:@"正在删除云端任务。。。"];
-        [tasks_view thread_delete_yunfile];
         dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+            [message_view showMessage:@"正在删除云端任务。。。"];
+            [tasks_view thread_delete_yunfile];
             [tasks_view thread_refresh];
             [message_view hideMessage];
-        });        
+        });
     }
 }
 

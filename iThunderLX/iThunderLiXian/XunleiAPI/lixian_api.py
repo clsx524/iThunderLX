@@ -62,12 +62,15 @@ def title_fix(title):
 def unescape_html(html):
 	return xml.sax.saxutils.unescape(html)
 
-def urlencode(x):
-    def unif8(u):
-        if type(u) == unicode:
-            u = u.encode('utf-8')
-            return u
-    return urllib.urlencode([(unif8(k), unif8(v)) for k, v in x.items()])
+def remove_bom(response):
+	if response.startswith('\xef\xbb\xbf'):
+		response = response[3:]
+	return response
+
+def assert_response(response, jsonp, value=1):
+	response = remove_bom(response)
+	print response
+	assert response == '%s(%s)' % (jsonp, value), repr(response)
 
 class LiXianAPI(object):
     DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11'
@@ -83,9 +86,8 @@ class LiXianAPI(object):
         self.username = ""
  
     def urlopen(self, url, **args):
-		#print url
 		if 'data' in args and type(args['data']) == dict:
-			args['data'] = urlencode(args['data'])
+			args['data'] = urllib.urlencode(args['data'])
 		return self.session.opener.open(urllib2.Request(url, **args), timeout=60)
 
     LOGIN_URL = 'http://login.xunlei.com/sec2login/'
@@ -521,13 +523,12 @@ class LiXianAPI(object):
         return False
             
     def task_delete(self, task_ids):
-        url = 'http://dynamic.cloud.vip.xunlei.com/interface/task_delete?type=%s&taskids=%s&databases=0,&noCacheIE=%s' % (2, task_ids+',', self._now)
-        print url
-        response = json.loads(re.match(r'^delete_task_resp\((.+)\)$', self.urlopen(url).read()).group(1))
-        if (response.get("type") == 2) and (response.get("result") == 1):
-            return True
-        return False
-            
+        jsonp = 'jsonp%s' % self._now
+        data = {'taskids': task_ids+',', 'databases': '0,'}
+        url = 'http://dynamic.cloud.vip.xunlei.com/interface/task_delete?callback=%s&type=%s&noCacheIE=%s' %(jsonp, 2, self._now)
+        response = self.urlopen(url, data=data).read()
+        response = remove_bom(response)
+        assert_response(response, jsonp, '{"result":1,"type":2}')            
 
     TASK_PAUSE_URL = "http://dynamic.cloud.vip.xunlei.com/interface/task_pause"
     def task_pause(self, task_ids):
