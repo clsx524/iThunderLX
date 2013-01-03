@@ -31,6 +31,31 @@
     tasks_view = [[TasksView alloc] initWithNibName:@"TasksView" bundle:[NSBundle bundleForClass:[self class]]];
     message_view = [[MessageView alloc] initWithNibName:@"MessageView" bundle:[NSBundle bundleForClass:[self class]] TasksView:tasks_view];
     
+    //// tab视图控制
+    
+    // 左tab (种子拖放区域)
+    NSView* leftTabView = [[torrent_tab_view tabViewItemAtIndex:0] view];
+    drop_zone_view = [[DropZoneView alloc] init];
+    drop_zone_view.delegate = self;
+    
+    [drop_zone_view setFrameOrigin:NSMakePoint(0, 0)];
+    [drop_zone_view setFrameSize:leftTabView.frame.size];
+    
+    [leftTabView addSubview:drop_zone_view positioned:NSWindowBelow relativeTo:[leftTabView.subviews objectAtIndex:0]];
+    
+    
+    // 右tab (种子文件列表)
+    torrent_view = [[TorrentView alloc] initWithNibName:@"TorrentView" bundle:[NSBundle bundleForClass:[self class]]];
+    
+    // 右tab按钮
+    [torrent_view.view addSubview:torrent_ok_button];
+    [torrent_view.view addSubview:torrent_back_button];
+    [torrent_view.view addSubview:torrent_add_cancel_button];
+    [torrent_view.view addSubview:torrent_select_all_button];
+    [torrent_view.view addSubview:torrent_negative_select_button];
+    
+    [[torrent_tab_view tabViewItemAtIndex:1] setView: torrent_view.view];
+    
     [self.window.contentView addSubview:tasks_view.view];
     [self.window.contentView addSubview:message_view.view];
     
@@ -141,39 +166,6 @@
 }
 
 //----------------------------------------
-//   登录窗口 - 添加BT任务
-//----------------------------------------
-- (IBAction)button_add_bt_task:(id)sender
-{
-    if (!self.hash || self.hash.length != 32) {
-        [[NSAlert alertWithMessageText:@"无法删除云端任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户！"] runModal];
-        return;
-    }
-    [NSApp endSheet:add_task_window returnCode:NSCancelButton];
-    __block NSString *bt_path;
-    
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setCanChooseFiles:YES];
-    [panel setCanChooseDirectories:NO];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setMessage:@"请选择BT文件地址."];
-    [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        [button_add_bt_task setEnabled:NO];
-        if (result == NSFileHandlingPanelOKButton) {
-            NSURL *url = [panel URL];
-            bt_path = [url path];
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-                if (![tasks_view thread_add_task:bt_path]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [[NSAlert alertWithMessageText:@"添加BT任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"添加任务失败，请确定您的BT文件正确并且不是中文文件名后重试。"] runModal];
-                    });
-                }
-            });
-        }
-    }];
-}
-
-//----------------------------------------
 //   SHEET - 关闭
 //----------------------------------------
 - (void)sheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
@@ -199,7 +191,7 @@
         [[NSAlert alertWithMessageText:@"无法添加任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户，再添加任务！"] runModal];
         return;
     }
-    [button_add_bt_task setEnabled:YES];
+
     [add_task_ok_button setEnabled:YES];
     [NSApp beginSheet:add_task_window modalForWindow:self.window modalDelegate:self didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 }
@@ -209,7 +201,6 @@
 //----------------------------------------
 -(IBAction)add_task_ok_button_click:(id)sender
 {
-    [button_add_bt_task setEnabled:NO];
     if ([[add_task_url stringValue] length]<5) {
         return;
     }
@@ -238,7 +229,6 @@
         }
         [add_task_progress stopAnimation:self];
         [add_task_url setStringValue:@""];
-        [button_add_bt_task setEnabled:YES];
     });
 }
 
@@ -248,6 +238,7 @@
 -(IBAction)add_task_cancel_button_click:(id)sender
 {
     [NSApp endSheet:add_task_window returnCode:NSCancelButton];
+    [self torrent_add_back_button:nil];
     [add_task_url setStringValue:@""];
 }
 
@@ -307,6 +298,168 @@
             [tasks_view thread_refresh];
             [message_view hideMessage];
         });
+    }
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 手动选择种子文件
+//--------------------------------------------------------------
+
+- (IBAction)add_torrent_file_button:(id)sender
+{
+    NSOpenPanel* openDlg = [NSOpenPanel openPanel];//123
+    
+    [openDlg setCanChooseFiles:YES];
+    [openDlg setAllowsMultipleSelection:NO];
+    [openDlg setCanChooseDirectories:NO];
+    [openDlg setAllowedFileTypes:[NSArray arrayWithObject:@"torrent"]];
+    
+    if ( [openDlg runModal] == NSOKButton )
+    {
+        NSArray* files = [openDlg URLs];
+        
+        
+        for(int i = 0; i < [files count]; i++ )
+        {
+            NSString* filePath = [[files objectAtIndex:i] path];
+            [self upload_torrent_file:filePath];
+        }
+        
+    }
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 拖放框收到种子文件
+//--------------------------------------------------------------
+- (void)didRecivedTorrentFile: (NSString*)filePath
+{
+    [self upload_torrent_file:filePath];
+}
+
+//--------------------------------------------------------------
+//     添加任务 - BT － 上传种子文件并返回文件列表
+//--------------------------------------------------------------
+
+- (void)upload_torrent_file: (NSString*)filePath
+{
+    [add_task_progress startAnimation:self];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+        NSDictionary* info = [tasks_view thread_get_torrent_file_list:filePath];
+        if (info.count != 0) {
+            torrent_view.info = info;
+            torrent_view.url = filePath;
+            [torrent_tab_view selectTabViewItemAtIndex:1];
+        } else {
+            dispatch_async( dispatch_get_main_queue(), ^{
+                [[NSAlert alertWithMessageText:@"添加任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"种子添加失败，请确认种子文件是否有效。"] runModal];
+                [self torrent_add_back_button:nil];
+            });
+        }
+        [add_task_progress stopAnimation:self];
+    });
+    [torrent_view.file_list_view reloadData];
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 按钮 － 文件列表选择完成，确认添加任务
+//--------------------------------------------------------------
+- (IBAction)torrent_add_confirm_button:(id)sender
+{
+    [add_task_progress startAnimation:self];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+        
+        // 判断是否没有选择任何文件
+        NSArray* fileList = [torrent_view.info objectForKey:@"filelist"];
+        BOOL none_selected = YES;
+        for (int i = 0; i < fileList.count; i++) {
+            if ([[[fileList objectAtIndex:i] objectForKey:@"valid"] boolValue])
+            {
+                none_selected = NO;
+            }
+        }
+        if (none_selected) {
+            dispatch_async( dispatch_get_main_queue(), ^{
+                [[NSAlert alertWithMessageText:@"添加任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"种子添加失败，请至少选择一个文件。"] runModal];
+            });
+            [add_task_progress stopAnimation:self];
+            
+        } else {
+            
+            if (![tasks_view thread_add_BT_task:torrent_view.info filePath:torrent_view.url])
+            {
+                dispatch_async( dispatch_get_main_queue(), ^{
+                    [[NSAlert alertWithMessageText:@"添加任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"种子添加失败，请确认种子文件是否有效。"] runModal];
+                });
+            } else {
+                dispatch_async( dispatch_get_main_queue(), ^{
+                    [NSApp endSheet:add_task_window returnCode:NSCancelButton];
+                    [self torrent_add_back_button:nil];
+                });
+            }
+            [add_task_progress stopAnimation:self];
+        }
+    });
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 按钮 － 返回拖放框
+//--------------------------------------------------------------
+- (IBAction)torrent_add_back_button:(id)sender {
+    torrent_view.info = nil;
+    torrent_view.url = nil;
+    [torrent_tab_view selectTabViewItemAtIndex:0];
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 按钮 － 取消
+//--------------------------------------------------------------
+- (IBAction)torrent_add_cancel_button:(id)sender {
+    [self torrent_add_back_button:nil];
+    [NSApp endSheet:add_task_window returnCode:NSCancelButton];
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 按钮 － 反选按钮
+//--------------------------------------------------------------
+
+- (IBAction)negative_selection_button:(id)sender
+{
+    NSArray* fileList = [torrent_view.info objectForKey:@"filelist"];
+    for (int i = 0; i < fileList.count; i++) {
+        NSDictionary* aFile = [fileList objectAtIndex:i];
+        if ([[aFile valueForKey:@"valid"] boolValue]) {
+            [aFile setValue: [NSNumber numberWithBool:FALSE] forKey:@"valid"];
+            [torrent_view.file_list_view reloadData];
+        } else {
+            [aFile setValue: [NSNumber numberWithBool:TRUE] forKey:@"valid"];
+            [torrent_view.file_list_view reloadData];
+        }
+    }
+}
+
+//--------------------------------------------------------------
+//     添加任务 － BT － 按钮 － 全选按钮
+//--------------------------------------------------------------
+
+- (IBAction)select_all_button:(id)sender
+{
+    NSArray* fileList = [torrent_view.info objectForKey:@"filelist"];
+    for (int i = 0; i < fileList.count; i++) {
+        NSDictionary* aFile = [fileList objectAtIndex:i];
+        [aFile setValue: [NSNumber numberWithBool:TRUE] forKey:@"valid"];
+        [torrent_view.file_list_view reloadData];
+    }
+}
+
+//--------------------------------------------------------------
+//     检查添加任务面板是否已打开
+//--------------------------------------------------------------
+
+- (BOOL)add_task_panel_is_open {
+    if ([add_task_window isVisible]) {
+        return YES;
+    } else {
+        return NO;
     }
 }
 

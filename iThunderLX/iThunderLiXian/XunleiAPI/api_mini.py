@@ -103,24 +103,24 @@ class GetTaskListHandler(tornado.web.RequestHandler):
 		tasklist_json = json.dumps(tasklist)
 		self.write(tasklist_json)
 
-class AddBTTaskHandler(tornado.web.RequestHandler):
-	def get(self, hash, path):
-		self.write("POST HERE")
+            #class AddBTTaskHandler(tornado.web.RequestHandler):
+            #def get(self, hash, path):
+            #	self.write("POST HERE")
     
-	def post(self):
-		hash = self.get_argument("hash")
-		path = self.get_argument("path")
-		isLogin = check_login(hash)
-		if not isLogin:
-			self.write("LFail")
-			self.finish()
-			return
+            #def post(self):
+            #hash = self.get_argument("hash")
+            #path = self.get_argument("path")
+            #isLogin = check_login(hash)
+            #if not isLogin:
+            #	self.write("LFail")
+            #	self.finish()
+            #	return
         
-		lixianAPI = lixianAPIs.get(hash)
-		if lixianAPI.add_bt_task_by_path(path):
-			self.write("Success")
-		else:
-			self.write("ADDFail")
+            #lixianAPI = lixianAPIs.get(hash)
+            #if lixianAPI.add_bt_task_by_path(path):
+            #	self.write("Success")
+            #else:
+            #	self.write("ADDFail")
 
 class AddTaskHandler(tornado.web.RequestHandler):
 	def get(self, hash, url):
@@ -160,6 +160,44 @@ class DeleteTaskHandler(tornado.web.RequestHandler):
 		else:
 			self.write("DeleteFail")
 
+class GetTorrentFileListHandler(tornado.web.RequestHandler):
+	def get(self, hash, url):
+		self.write("POST HERE")
+    
+	def post(self):
+		hash = self.get_argument("hash")
+		url = self.get_argument("url")
+        
+		isLogin = check_login(hash)
+		if not isLogin:
+			self.write("Fail")
+			self.finish()
+			return
+        
+		lixianAPI = lixianAPIs.get(hash)
+		filelist = lixianAPI.torrent_upload_by_path(url)
+		self.write(json.dumps(filelist))
+
+class AddBTTaskHandler(tornado.web.RequestHandler):
+	def get(self, hash, url):
+		self.write("POST HERE")
+    
+	def post(self):
+		hash = self.get_argument("hash")
+		info = json.loads(self.get_argument("info"))
+		url = self.get_argument("url")
+		isLogin = check_login(hash)
+		if not isLogin:
+			self.write("Fail")
+			self.finish()
+			return
+		lixianAPI = lixianAPIs.get(hash)
+		if lixianAPI.add_bt_task_with_dict(url,info):
+			self.write("Success")
+		else:
+			self.write("Fail")
+
+
 class GetBTListHandler(tornado.web.RequestHandler):
 	def get(self, hash, tid, cid):
 		isLogin = check_login(hash)
@@ -167,11 +205,10 @@ class GetBTListHandler(tornado.web.RequestHandler):
 			self.write("Fail")
 			self.finish()
 			return
-			
+        
 		lixianAPI = lixianAPIs.get(hash)
 		result = lixianAPI.get_bt_list(int(tid), cid)
 		self.write(json.dumps(result))
-        print "OK"
 
 class GetCookieHandler(tornado.web.RequestHandler):
 	def get(self, hash):
@@ -214,10 +251,11 @@ application = tornado.web.Application([
 	(r'/initial/(.*)/(.*)', InitialHandler),  #API 1
 	(r'/([A-Za-z0-9]{32})/get_task_list/([0-9]*)/([0-9]*)', GetTaskListHandler), #API 2
 	(r'/add_task', AddTaskHandler), #API 3
-    (r'/add_torrent_task', AddBTTaskHandler), #API 4
+    (r'/add_bt_task', AddBTTaskHandler), #API 4
     (r'/task_delete',DeleteTaskHandler), #API 5
-	(r'/([A-Za-z0-9]{32})/get_bt_list/(.*)/(.*)', GetBTListHandler), #API 6 TID CID
-	(r'/([A-Za-z0-9]{32})/get_cookie',  GetCookieHandler),
+    (r'/([A-Za-z0-9]{32})/get_bt_list/(.*)/(.*)', GetBTListHandler), #API 6 TID CID
+    (r'/get_torrent_file_list', GetTorrentFileListHandler), #API 7    
+    (r'/([A-Za-z0-9]{32})/get_cookie',  GetCookieHandler),
 	(r'/vod_get_play_url', VodGetPlayUrl),
 	(r'(.*)', ZeroHandler),  #API Zero
 

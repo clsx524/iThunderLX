@@ -29,7 +29,7 @@
     
     IBOutlet NSButton *check_for_delete;
     IBOutlet NSButton *leftTimeButton;
-
+    
     NSOperationQueue *operation_download_queue;
     NSMutableArray *mutable_array;
     NSString *delete_files_list;
@@ -52,5 +52,8 @@
 - (BOOL)thread_check_downloading;
 - (void)thread_button_config:(BOOL)state;
 - (void)thread_refresh;
+
+- (BOOL)thread_add_BT_task:(NSDictionary *)infoDict filePath: (NSString*)url;
+- (NSDictionary*)thread_get_torrent_file_list:(NSString *)file_path;
 
 @end
