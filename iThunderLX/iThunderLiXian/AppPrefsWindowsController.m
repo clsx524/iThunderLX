@@ -62,7 +62,7 @@
 
 -(IBAction)donateButton:(id)sender
 {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://clsx524.github.com"]];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://glurl.co/B8"]];
 }
 
 -(IBAction)openCLSX524_BLOG:(id)sender
