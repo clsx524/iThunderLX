@@ -41,18 +41,18 @@
     //    NSString *check_update = [RequestSender sendRequest:@"http://api.4321.la/analytics-thunder.php?ver=20120730"];
     //    dispatch_async( dispatch_get_main_queue(), ^{
     //        if ([check_update hasPrefix:@"Update"]) {
-    //            [[NSAlert alertWithMessageText:@"更新" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"软件检测到fakeThunder有新版本的发布."] runModal];
-   //         }
+    //            [[NSAlert alertWithMessageText:@"更新" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"软件检测到iThunderLX有新版本的发布."] runModal];
+    //        }
     //    });
-   // });
+    //});
     
     /*广告～*/
     
     NSUserDefaults *user_default = [NSUserDefaults standardUserDefaults];
     NSInteger s = [user_default integerForKey:@UD_FIRST_STARTUP];
-    if (s < 10e8) {
+    if (s < 5) {
         [user_default setInteger:s+1 forKey:@UD_FIRST_STARTUP];
-    } else if (s == 10e8)
+    } else if (s == 5)
     {
         [user_default setInteger:0 forKey:@UD_FIRST_STARTUP];
         [[NSAlert alertWithMessageText:@"捐赠作者" defaultButton:@"我知道了" alternateButton:nil otherButton:nil informativeTextWithFormat:@"iThunderLX是一款开源、免费软件，仍有很大的开发空间。非常高兴能够看到iThunderLX能够帮助到您，如果您喜欢这款软件，请考虑捐赠作者以支持后续的开发和维护费用。具体捐赠方式可查看软件偏好设置 - 高级。\n\n感谢您的支持，本对话框不会再次出现。"] runModal];

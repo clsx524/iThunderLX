@@ -509,7 +509,7 @@
 						<object class="NSTextField" id="518921973">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 357}, {69, 17}}</string>
+							<string key="NSFrame">{{20, 357}, {69, 17}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="607538154"/>
@@ -530,7 +530,7 @@
 						<object class="NSTextField" id="607538154">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{85, 352}, {502, 22}}</string>
+							<string key="NSFrame">{{85, 352}, {498, 22}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="50288829"/>
@@ -552,7 +552,7 @@
 						<object class="NSButton" id="561716532">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{504, 316}, {89, 32}}</string>
+							<string key="NSFrame">{{500, 312}, {89, 32}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="585067848"/>
@@ -577,7 +577,7 @@
 						<object class="NSButton" id="967823044">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{398, 316}, {89, 32}}</string>
+							<string key="NSFrame">{{400, 312}, {89, 32}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="561716532"/>
@@ -602,7 +602,7 @@
 						<object class="NSTextField" id="50288829">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 327}, {279, 17}}</string>
+							<string key="NSFrame">{{20, 323}, {279, 17}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="869425376"/>
@@ -626,7 +626,7 @@
 						<object class="NSProgressIndicator" id="869425376">
 							<reference key="NSNextResponder" ref="59753985"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{366, 325}, {16, 16}}</string>
+							<string key="NSFrame">{{364, 321}, {16, 16}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="967823044"/>
@@ -640,7 +640,6 @@
 							<string key="NSFrame">{{23, 20}, {560, 274}}</string>
 							<reference key="NSSuperview" ref="59753985"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="526180619"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="554605436">
@@ -2025,14 +2024,14 @@
 						<int key="objectID">179</int>
 						<reference key="object" ref="59753985"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="518921973"/>
 							<reference ref="607538154"/>
-							<reference ref="50288829"/>
-							<reference ref="967823044"/>
-							<reference ref="869425376"/>
 							<reference ref="585067848"/>
 							<reference ref="639425627"/>
+							<reference ref="967823044"/>
+							<reference ref="869425376"/>
 							<reference ref="561716532"/>
+							<reference ref="518921973"/>
+							<reference ref="50288829"/>
 						</array>
 						<reference key="parent" ref="1004824840"/>
 					</object>
@@ -2838,13 +2837,13 @@
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NSMenuCheckmark">{11, 11}</string>
 			<string key="NSMenuMixedState">{10, 3}</string>
-			<string key="delete_128">{128, 128}</string>
+			<string key="delete_128">{64, 64}</string>
 			<string key="drag_icon">{64, 64}</string>
-			<string key="loadToolbarItem">{256, 256}</string>
+			<string key="loadToolbarItem">{64, 64}</string>
 			<string key="login">{311, 63}</string>
-			<string key="loginToolbarItem">{61.442050068402345, 61.442050068402345}</string>
+			<string key="loginToolbarItem">{15.360512517100586, 15.360512517100586}</string>
 			<string key="newToolbarItem">{128, 128}</string>
-			<string key="reload">{48, 48}</string>
+			<string key="reload">{64, 64}</string>
 		</dictionary>
 	</data>
 </archive>
