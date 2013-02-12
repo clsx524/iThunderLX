@@ -87,7 +87,6 @@ class InitialHandler(tornado.web.RequestHandler):
 		else:
 			self.write('Fail')
 
-
 class GetTaskListHandler(tornado.web.RequestHandler):
 	def get(self, hash, limit, st):
 	
@@ -102,25 +101,6 @@ class GetTaskListHandler(tornado.web.RequestHandler):
 		tasklist = lixianAPI.get_task_list(int(limit), int(st))
 		tasklist_json = json.dumps(tasklist)
 		self.write(tasklist_json)
-
-            #class AddBTTaskHandler(tornado.web.RequestHandler):
-            #def get(self, hash, path):
-            #	self.write("POST HERE")
-    
-            #def post(self):
-            #hash = self.get_argument("hash")
-            #path = self.get_argument("path")
-            #isLogin = check_login(hash)
-            #if not isLogin:
-            #	self.write("LFail")
-            #	self.finish()
-            #	return
-        
-            #lixianAPI = lixianAPIs.get(hash)
-            #if lixianAPI.add_bt_task_by_path(path):
-            #	self.write("Success")
-            #else:
-            #	self.write("ADDFail")
 
 class AddTaskHandler(tornado.web.RequestHandler):
 	def get(self, hash, url):
@@ -197,7 +177,6 @@ class AddBTTaskHandler(tornado.web.RequestHandler):
 		else:
 			self.write("Fail")
 
-
 class GetBTListHandler(tornado.web.RequestHandler):
 	def get(self, hash, tid, cid):
 		isLogin = check_login(hash)
@@ -245,8 +224,6 @@ class ZeroHandler(tornado.web.RequestHandler):
 	def get(self, hash):
 		self.write("Mitsukatta~~ToT")
 
-
-
 application = tornado.web.Application([
 	(r'/initial/(.*)/(.*)', InitialHandler),  #API 1
 	(r'/([A-Za-z0-9]{32})/get_task_list/([0-9]*)/([0-9]*)', GetTaskListHandler), #API 2
@@ -261,7 +238,6 @@ application = tornado.web.Application([
 
 ])
 
-
 if __name__ == "__main__":
 	
 	pyfile_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -269,7 +245,6 @@ if __name__ == "__main__":
 	lixianAPIs = {}
 	lixianAPIs_login_status = {}
 	lixianAPIs_last_update_time = {}
-	
 	
 	application.listen(9999)
 	print "The Thunder API Sutato!"

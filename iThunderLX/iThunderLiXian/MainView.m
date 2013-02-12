@@ -14,6 +14,10 @@
 
 @implementation MainView
 
+@synthesize hash;
+@synthesize cookie;
+@synthesize current_page;
+
 - (id)initWithWindow:(NSWindow *)window
 {
     self = [super initWithWindow:window];
@@ -77,6 +81,7 @@
             current_page = 0;
             [tasks_view thread_get_task_list:0];
             [message_view hideMessage];
+            [self checkLink];
         });
     }
 }
@@ -191,7 +196,7 @@
         [[NSAlert alertWithMessageText:@"无法添加任务" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"请先登录您的迅雷VIP账户，再添加任务！"] runModal];
         return;
     }
-
+    
     [add_task_ok_button setEnabled:YES];
     [NSApp beginSheet:add_task_window modalForWindow:self.window modalDelegate:self didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 }
@@ -207,7 +212,17 @@
     [add_task_ok_button setEnabled:NO];
     [add_task_progress startAnimation:self];
     
-    NSString *taskStr = [[add_task_url stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    [self add_task_fire_by_url:[add_task_url stringValue]];
+    
+    //NSString *taskStr = [[add_task_url stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
+//----------------------------------------
+//   执行添加任务
+//----------------------------------------
+-(void)add_task_fire_by_url:(NSString *)url
+{
+    NSString *taskStr = [url stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
     NSArray *taskUrls = [taskStr componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
@@ -217,13 +232,13 @@
                 
                 dispatch_async( dispatch_get_main_queue(), ^{
                     
-                    [[NSAlert alertWithMessageText:@"添加任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"添加任务失败，请确定您的地址正确无误后重试。Url:%@", taskUrl] runModal];                    
-                    [add_task_ok_button setEnabled:YES];                    
-                });                
-                break;                
-            } else {                
-                dispatch_async( dispatch_get_main_queue(), ^{                    
-                    [NSApp endSheet:add_task_window returnCode:NSCancelButton];                  
+                    [[NSAlert alertWithMessageText:@"添加任务失败" defaultButton:@"确定" alternateButton:nil otherButton:nil informativeTextWithFormat:@"添加任务失败，请确定您的地址正确无误后重试。Url:%@", taskUrl] runModal];
+                    [add_task_ok_button setEnabled:YES];
+                });
+                break;
+            } else {
+                dispatch_async( dispatch_get_main_queue(), ^{
+                    [NSApp endSheet:add_task_window returnCode:NSCancelButton];
                 });
             }
         }
@@ -278,6 +293,30 @@
             [tasks_view thread_refresh];
             [message_view hideMessage];
         });
+    }
+    
+    [self checkLink];
+}
+//----------------------------------------
+//   检测clipboard是否有magnet链接  --added by dqaria dqaria@gmail.com
+//----------------------------------------
+
+-(void)checkLink
+{
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    NSArray *classes = [[NSArray alloc] initWithObjects:[NSString class], nil];
+    NSDictionary *options = [NSDictionary dictionary];
+    NSArray *copiedItems = [pasteboard readObjectsForClasses:classes options:options];
+    if (copiedItems != nil) {
+        NSError *error = NULL;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"magnet"
+                                                          options:NSRegularExpressionCaseInsensitive
+                                                          error:&error];
+        NSTextCheckingResult *match = [regex firstMatchInString:copiedItems[0] options:0 range:NSMakeRange(0, [copiedItems[0] length])];
+        if (match) {
+            [self add_task_fire_by_url:copiedItems[0]];
+            [pasteboard clearContents];
+        }
     }
 }
 

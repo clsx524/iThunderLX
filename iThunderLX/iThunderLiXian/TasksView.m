@@ -14,6 +14,9 @@
 
 @implementation TasksView
 
+@synthesize hash;
+@synthesize cookie;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -424,11 +427,11 @@
         BOOL isExist;
         
         if (!t.FatherTitle) {
-            isExist = [[NSWorkspace sharedWorkspace] selectFile:[NSString stringWithFormat:@"%@/%@",save_path, t.TaskTitle] inFileViewerRootedAtPath:@""];
+            isExist = [[NSWorkspace sharedWorkspace] selectFile:[NSString stringWithFormat:@"%@/%@",save_path, t.TaskTitle] inFileViewerRootedAtPath: @""];
         } else {
             isExist = [[NSWorkspace sharedWorkspace] selectFile:[NSString stringWithFormat:@"%@/%@/%@",save_path, t.FatherTitle,t.TaskTitle] inFileViewerRootedAtPath:@""];
         }
-        if (t.TaskLiXianProcess ==@"已从云端删除该任务" || t.FatherTaskModel.TaskLiXianProcess ==@"已从云端删除该任务") {
+        if ([t.TaskLiXianProcess isEqualToString: @"已从云端删除该任务"] || [t.FatherTaskModel.TaskLiXianProcess isEqualToString: @"已从云端删除该任务"]) {
             isExist = YES;
         }
         if (!isExist) {

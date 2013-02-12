@@ -10,6 +10,31 @@
 
 @implementation TaskModel
 
+@synthesize TaskID;
+@synthesize Indeterminate;
+@synthesize hash;
+@synthesize Cookie;
+@synthesize TaskDownloadedSize;
+@synthesize TaskLiXianProcess;
+@synthesize ButtonEnabled;
+@synthesize FatherTaskModel;
+@synthesize TaskSizeDescription;
+@synthesize CID;
+@synthesize YunDelete;
+@synthesize LiXianURL;
+@synthesize ProgressValue;
+@synthesize TaskSize;
+@synthesize LeftDownloadTime;
+@synthesize LeftTimeButtonHidden;
+@synthesize FatherTitle;
+@synthesize TaskTypeString;
+@synthesize TaskTitle;
+@synthesize TaskType;
+@synthesize StartAllDownloadNow;
+@synthesize download_operation;
+@synthesize ButtonTitle;
+
+
 -(void)dealloc {
     self.TaskID = nil;
     self.TaskType = nil;
