@@ -98,7 +98,7 @@ class GetTaskListHandler(tornado.web.RequestHandler):
 			
 		lixianAPI = lixianAPIs.get(hash)
 		
-		tasklist = lixianAPI.get_task_list(int(limit), int(st))
+		tasklist = lixianAPI.get_task_list(int(limit), 4)
 		tasklist_json = json.dumps(tasklist)
 		self.write(tasklist_json)
 

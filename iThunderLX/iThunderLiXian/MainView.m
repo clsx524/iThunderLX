@@ -307,7 +307,7 @@
     NSArray *classes = [[NSArray alloc] initWithObjects:[NSString class], nil];
     NSDictionary *options = [NSDictionary dictionary];
     NSArray *copiedItems = [pasteboard readObjectsForClasses:classes options:options];
-    if (copiedItems != nil) {
+    if (copiedItems.count) {
         NSError *error = NULL;
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"magnet"
                                                           options:NSRegularExpressionCaseInsensitive
@@ -315,7 +315,6 @@
         NSTextCheckingResult *match = [regex firstMatchInString:copiedItems[0] options:0 range:NSMakeRange(0, [copiedItems[0] length])];
         if (match) {
             [self add_task_fire_by_url:copiedItems[0]];
-            [pasteboard clearContents];
         }
     }
 }
