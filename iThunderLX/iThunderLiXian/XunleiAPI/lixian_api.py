@@ -82,6 +82,7 @@ class LiXianAPI(object):
     BATCH_TASK_COMMIT_URL = "http://dynamic.cloud.vip.xunlei.com/interface/batch_task_commit?callback=jsonp1234567890"
     TORRENT_UPDATE_URL = "http://dynamic.cloud.vip.xunlei.com/interface/torrent_upload"
     FILL_BT_LIST = "http://dynamic.cloud.vip.xunlei.com/interface/fill_bt_list"
+    BT_TASK_COMMIT_URL = "http://dynamic.cloud.vip.xunlei.com/interface/bt_task_commit?callback=jsonp1234567890"
     TASK_DELAY_URL = "http://dynamic.cloud.vip.xunlei.com/interface/task_delay?taskids=%(ids)s&noCacheIE=%(cachetime)d"
     TASK_DELETE_URL = "http://dynamic.cloud.vip.xunlei.com/interface/task_delete"
     TASK_PAUSE_URL = "http://dynamic.cloud.vip.xunlei.com/interface/task_pause"
@@ -472,7 +473,7 @@ class LiXianAPI(object):
                                                             noCacheIE = self._now))
         
         r.raise_for_status()
-        function, args = parser_js_function_call(r.content[3:])
+        function, args = parser_js_function_call(r.content)
         DEBUG(pformat(args))
         if not args:
             return {}
