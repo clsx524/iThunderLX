@@ -369,7 +369,7 @@
 //--------------------------------------------------------------
 //     添加任务 － BT － 拖放框收到种子文件
 //--------------------------------------------------------------
-- (void)didRecivedTorrentFile: (NSString*)filePath
+- (void)didReceivedTorrentFile: (NSString*)filePath
 {
     [self upload_torrent_file:filePath];
 }

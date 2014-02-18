@@ -93,8 +93,7 @@
         
         [task setArguments:args];
         
-        NSPipe *pipe = [NSPipe pipe];
-        [task setStandardOutput:pipe];
+        [task setStandardOutput:[NSPipe pipe]];
         [task setStandardInput:[NSPipe pipe]];
         [task launch];
         

@@ -12,11 +12,11 @@
 @protocol DropZoneDelegate <NSObject>
 
 @optional
-- (void)didRecivedTorrentFile: (NSString*)filePath;
+- (void)didReceivedTorrentFile: (NSString*)filePath;
 
 @end
 
-@interface DropZoneView : NSView{
+@interface DropZoneView : NSView {
     BOOL highlight;
     BOOL wrong_file;
     BOOL not_single;

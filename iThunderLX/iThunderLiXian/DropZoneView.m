@@ -24,14 +24,14 @@
 //     Delegate
 //--------------------------------------------------------------
 
-- (void)torrentDropped : (NSString*) filePath{
-    if ([[self delegate]respondsToSelector:@selector(didRecivedTorrentFile:)]) {
-		[self.delegate didRecivedTorrentFile:filePath];
+- (void)torrentDropped: (NSString*)filePath {
+    if ([[self delegate] respondsToSelector:@selector(didRecivedTorrentFile:)]) {
+		[self.delegate didReceivedTorrentFile:filePath];
 	}
 }
-- (void) setDelegate:(id <DropZoneDelegate>)aDelegate {
-    if (delegate != aDelegate) {
-        delegate = aDelegate;
+- (void) setDelegate:(id <DropZoneDelegate>)_delegate {
+    if (delegate != _delegate) {
+        delegate = _delegate;
 
     }
 }
@@ -39,54 +39,54 @@
 //     拖放相关
 //--------------------------------------------------------------
 
-- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender{
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender {
     NSArray *draggedFilenames = [[sender draggingPasteboard] propertyListForType:NSFilenamesPboardType];
     if ([draggedFilenames count] > 1) {
-        highlight=NO;
-        not_single=YES;
-        wrong_file=NO;
-        [self setNeedsDisplay: YES];
+        highlight = NO;
+        not_single = YES;
+        wrong_file = NO;
+        [self setNeedsDisplay:YES];
         return NSDragOperationNone;
-    } else if (![[[draggedFilenames objectAtIndex:0] pathExtension]isEqual:@"torrent"]){
-        highlight=NO;
-        not_single=NO;
-        wrong_file=YES;
-        [self setNeedsDisplay: YES];
+    } else if (![[[draggedFilenames objectAtIndex:0] pathExtension] isEqualToString:@"torrent"]){
+        highlight = NO;
+        not_single = NO;
+        wrong_file = YES;
+        [self setNeedsDisplay:YES];
         return NSDragOperationNone;
     } else {
-        highlight=YES;
-        not_single=NO;
-        wrong_file=NO;
-        [self setNeedsDisplay: YES];
+        highlight = YES;
+        not_single = NO;
+        wrong_file = NO;
+        [self setNeedsDisplay:YES];
         return NSDragOperationCopy;
     }
 }
 
-- (void)draggingExited:(id <NSDraggingInfo>)sender{
-    highlight=NO;
-    wrong_file=NO;
-    not_single=NO;
-    [self setNeedsDisplay: YES];
+- (void)draggingExited:(id <NSDraggingInfo>)sender {
+    highlight = NO;
+    wrong_file = NO;
+    not_single = NO;
+    [self setNeedsDisplay:YES];
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender {
-    highlight=NO;
-    wrong_file=NO;
-    not_single=NO;
-    [self setNeedsDisplay: YES];
+    highlight = NO;
+    wrong_file = NO;
+    not_single = NO;
+    [self setNeedsDisplay:YES];
     return YES;
 }
 
 - (BOOL)performDragOperation:(id < NSDraggingInfo >)sender {
     NSArray *draggedFilenames = [[sender draggingPasteboard] propertyListForType:NSFilenamesPboardType];
-    if ([[[draggedFilenames objectAtIndex:0] pathExtension] isEqual:@"torrent"]){
+    if ([[[draggedFilenames objectAtIndex:0] pathExtension] isEqualToString:@"torrent"]) {
         return YES;
     } else {
         return NO;
     }
 }
 
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender{
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender {
     NSArray *draggedFilenames = [[sender draggingPasteboard] propertyListForType:NSFilenamesPboardType];
     NSString *filePath = [draggedFilenames objectAtIndex:0];
     [self torrentDropped:filePath];
@@ -98,8 +98,7 @@
 - (void)drawRect:(NSRect)rect{
     [super drawRect:rect];
     
-
-    if ( highlight ) {
+    if (highlight) {
         //// Color Declarations
         NSColor* color = [NSColor colorWithCalibratedRed: 0.84 green: 0.84 blue: 0.84 alpha: 1];
         

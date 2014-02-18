@@ -58,7 +58,7 @@
 - (IBAction)torrent_add_back_button:(id)sender;
 - (IBAction)torrent_add_cancel_button:(id)sender;
 - (IBAction)toolbar_add_task:(id)sender;
-- (void)didRecivedTorrentFile: (NSString*)filePath;
+- (void)didReceivedTorrentFile: (NSString*)filePath;
 - (void)upload_torrent_file: (NSString*)filePath;
 - (BOOL)add_task_panel_is_open;
 @end

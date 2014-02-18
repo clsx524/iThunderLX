@@ -17,11 +17,9 @@
 @synthesize hash;
 @synthesize cookie;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self)
-    {
+    if (self) {
         [nav_button setHidden:YES];
         hash = [[NSString alloc] init];
         
@@ -50,8 +48,7 @@
 //--------------------------------------------------------------
 //      监视软件偏好设置中的最大下载任务数的更改
 //--------------------------------------------------------------
--(void)set_max_tasks
-{
+-(void)set_max_tasks {
     NSLog(@"CHANGE MAX TASKS");
     [operation_download_queue setMaxConcurrentOperationCount:[[NSUserDefaults standardUserDefaults] integerForKey:@UD_MAX_TASKS]];
 }
@@ -59,8 +56,7 @@
 //--------------------------------------------------------------
 //      线程：添加任务
 //--------------------------------------------------------------
--(BOOL)thread_add_task:(NSString *)task_url
-{
+-(BOOL)thread_add_task:(NSString *)task_url {
     NSFileManager *fileMngr = [NSFileManager defaultManager];
     
     NSString *request_url = @"http://127.0.0.1:9999/add_task";
@@ -73,8 +69,7 @@
     if ([fileMngr fileExistsAtPath:task_url]) {
         request_data = [NSString stringWithFormat:@"hash=%@&path=%@", self.hash, task_url];
         requestResult = [RequestSender postRequest:request_url_bt withBody:request_data];
-    } else
-    {
+    } else {
         encodedValue = (__bridge NSString*)CFURLCreateStringByAddingPercentEscapes(nil,(CFStringRef)task_url, nil,(CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
         request_data = [NSString stringWithFormat:@"hash=%@&url=%@", self.hash, encodedValue];
         requestResult = [RequestSender postRequest:request_url withBody:request_data];
@@ -94,13 +89,12 @@
 //--------------------------------------------------------------
 //      线程：获取任务列表，并自动添加到主界面
 //--------------------------------------------------------------
-- (void)thread_get_task_list:(NSInteger)page_num
-{
+- (void)thread_get_task_list:(NSInteger)page_num {
     [nav_button setHidden:YES];
     
     NSString *requestResult = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/%@/get_task_list/%lu/0",self.hash, (page_num+1) * 20]];
     
-    if ([requestResult isEqualToString:@"FAIL"])  {
+    if ([requestResult isEqualToString:@"FAIL"]) {
         return;
     }
     
@@ -116,12 +110,10 @@
 //--------------------------------------------------------------
 //      线程：获取第一个任务
 //--------------------------------------------------------------
-- (NSDictionary *)thread_get_first_task
-{
+- (NSDictionary *)thread_get_first_task {
     NSString *requestResult = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/%@/get_task_list/1/0",self.hash]];
     
-    if ([requestResult isEqualToString:@"Fail"])
-    {
+    if ([requestResult isEqualToString:@"Fail"]) {
         return nil;
     }
     
@@ -275,7 +267,7 @@
         else {
             
             NSString *file_list = [RequestSender sendRequest:[NSString stringWithFormat:@"http://127.0.0.1:9999/%@/get_bt_list/%@/%@",self.hash,t.TaskID,t.CID]];
-            NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:[file_list dataUsingEncoding:NSUTF8StringEncoding] options:    NSJSONReadingMutableContainers|NSJSONReadingAllowFragments error:nil];
+            NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:[file_list dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers|NSJSONReadingAllowFragments error:nil];
             //sleep(1); //等待渐变动画结束，然后再继续
             [nav_label setStringValue:t.TaskTitle];
             for (NSDictionary *dict in jsonArray) {
@@ -559,31 +551,49 @@
     NSString *file_path = [[NSUserDefaults standardUserDefaults] objectForKey:@UD_SAVE_PATH];
     file_path = [file_path stringByExpandingTildeInPath];
     
-    NSString *file_path_orig = file_path;
-    NSString *file_path_father = file_path;
+    //NSString *file_path_orig = file_path;
+    //NSString *file_path_father = file_path;
     NSArray *listOfFiles;
+    
     if (!t.FatherTitle) {
-        file_path_orig = [NSString stringWithFormat:@"%@/%@",file_path, t.TaskTitle];
-    }
-    else {
-        file_path_orig = [NSString stringWithFormat:@"%@/%@/%@",file_path, t.FatherTitle, t.TaskTitle];
-        file_path_father = [NSString stringWithFormat:@"%@/%@",file_path, t.FatherTitle];
-        listOfFiles = [fileMngr contentsOfDirectoryAtPath:file_path_father error:nil];
-    }
-    
-    NSString *file_path_aria2 =[file_path_orig stringByAppendingPathExtension:@"aria2"];
-    
-    if([fileMngr fileExistsAtPath:file_path_orig] && [fileMngr fileExistsAtPath:file_path_aria2])
-    {
-        [fileMngr removeItemAtPath:file_path_orig error:nil];
-        [fileMngr removeItemAtPath:file_path_aria2 error:nil];
-        if (t.FatherTitle) {
-            NSArray *btlist = [NSArray arrayWithObjects:t.TaskTitle, [t.TaskTitle stringByAppendingPathExtension:@"aria2"], nil];
-            if ([btlist isEqualToArray:listOfFiles]) {
-                [fileMngr removeItemAtPath:file_path_father error:nil];
-            }
+        NSPredicate* predicate = [NSPredicate predicateWithFormat:@"%@", [t.TaskTitle stringByAppendingString:@"*"]];
+        listOfFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:file_path error:nil];
+        listOfFiles = [listOfFiles initWithObjects:[listOfFiles filteredArrayUsingPredicate:predicate], nil];
+        NSLog(@"%@", listOfFiles);
+        for (NSString* str in listOfFiles) {
+            [fileMngr removeItemAtPath:str error:nil];
         }
+    } else {
+        listOfFiles = [listOfFiles initWithObjects:[NSString stringWithFormat:@"%@/%@", file_path, t.FatherTitle], nil];
+        [fileMngr removeItemAtPath:file_path error:nil];
     }
+    
+    
+//    NSString *file_path_orig = file_path;
+//    NSString *file_path_father = file_path;
+//    NSArray *listOfFiles;
+//    if (!t.FatherTitle) {
+//        file_path_orig = [NSString stringWithFormat:@"%@/%@",file_path, t.TaskTitle];
+//    }
+//    else {
+//        file_path_orig = [NSString stringWithFormat:@"%@/%@/%@",file_path, t.FatherTitle, t.TaskTitle];
+//        file_path_father = [NSString stringWithFormat:@"%@/%@",file_path, t.FatherTitle];
+//        listOfFiles = [fileMngr contentsOfDirectoryAtPath:file_path_father error:nil];
+//    }
+//    
+//    NSString *file_path_aria2 =[file_path_orig stringByAppendingPathExtension:@"aria2"];
+//    
+//    if([fileMngr fileExistsAtPath:file_path_orig] && [fileMngr fileExistsAtPath:file_path_aria2])
+//    {
+//        [fileMngr removeItemAtPath:file_path_orig error:nil];
+//        [fileMngr removeItemAtPath:file_path_aria2 error:nil];
+//        if (t.FatherTitle) {
+//            NSArray *btlist = [NSArray arrayWithObjects:t.TaskTitle, [t.TaskTitle stringByAppendingPathExtension:@"aria2"], nil];
+//            if ([btlist isEqualToArray:listOfFiles]) {
+//                [fileMngr removeItemAtPath:file_path_father error:nil];
+//            }
+//        }
+//    }
 }
 
 -(IBAction)menu_cancel_delete_fiLe:(id)sender {

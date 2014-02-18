@@ -17,7 +17,7 @@
 	[request addValue:contentType forHTTPHeaderField: @"Content-Type"];
     [request addValue:@"MACOSX" forHTTPHeaderField:@"User-agent"];
 	NSHTTPURLResponse* urlResponse = nil;  
-	NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&urlResponse error:NULL];  
+	NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&urlResponse error:nil];
 	NSString *result = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
     //0x80000632 gb2312
 
